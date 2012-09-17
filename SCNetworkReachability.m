@@ -7,37 +7,31 @@
 //
 
 #import "SCNetworkReachability.h"
+#import "SCNetworkReachabilityRefCreator.h"
+#import "SCNetworkReachabilityFlagsParser.h"
+#import "SCNetworkReachabilityScheduler.h"
 
-#define SC_EXCEPTION_HOST_NAME      @"SCNetworkReachability host name is empty"
-#define SC_DOMAIN_GET_FLAGS         @"SCNetworkReachability can't determine reachability flags"
-#define SC_CODE_GET_FLAGS           501
-#define SC_DOMAIN_REF               @"SCNetworkReachability can't create reachability ref"
-#define SC_CODE_REF                 502
+#define SC_ERROR_DOMAIN_GET_FLAGS   @"SCNetworkReachability: Can't determine reachability flags"
+#define SC_ERROR_CODE_GET_FLAGS     501
 
 @interface SCNetworkReachability ()
-- (void)checkReachabilityFlags;
-- (void)parseReachabilityFlags:(SCNetworkReachabilityFlags)flags;
+- (void)checkReachability;
 @end
 
 @implementation SCNetworkReachability
 
-@synthesize isReachable, device, error;
+@synthesize isReachable, device;
 
 #pragma mark -
 #pragma mark main routine
 
 - (id)initWithHostName:(NSString *)hostName
 {
-    if (hostName.length == 0)
-    {
-        @throw [NSException exceptionWithName:SC_EXCEPTION_HOST_NAME reason:SC_EXCEPTION_HOST_NAME
-                                     userInfo:nil];
-    }
     self = [super init];
     if (self)
     {
-        reachabilityRef = SCNetworkReachabilityCreateWithName(NULL, [hostName UTF8String]);
-        [self checkReachabilityFlags];
+        reachabilityRef = [SCNetworkReachabilityRefCreator newReachabilityRefWithHostName:hostName];
+        [self checkReachability];
     }
     return self;
 }
@@ -47,27 +41,31 @@
     self = [super init];
     if (self)
     {
-        const struct sockaddr *castedAddress = (const struct sockaddr *)hostAddress;
-        reachabilityRef = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, castedAddress);
-        [self checkReachabilityFlags];
+        reachabilityRef = [SCNetworkReachabilityRefCreator
+                           newReachabilityRefWithHostAddress:hostAddress];
+        [self checkReachability];
     }
     return self;
 }
 
 - (id)initForLocalWiFi
 {
-    struct sockaddr_in localWifiAddress;
-	bzero(&localWifiAddress, sizeof(localWifiAddress));
-	localWifiAddress.sin_len = sizeof(localWifiAddress);
-	localWifiAddress.sin_family = AF_INET;
-	localWifiAddress.sin_addr.s_addr = htonl(IN_LINKLOCALNETNUM);
-    return [self initWithHostAddress:&localWifiAddress];
+    self = [super init];
+    if (self)
+    {
+        reachabilityRef = [SCNetworkReachabilityRefCreator newReachabilityRefForLocalWiFi];
+        [self checkReachability];
+    }
+    return self;
 }
 
 - (void)dealloc
 {
+    if (delegate)
+    {
+        [SCNetworkReachabilityScheduler unscheduleReachabilityRef:reachabilityRef];
+    }
     CFRelease(reachabilityRef);
-    [error release];
     [super dealloc];
 }
 
@@ -90,56 +88,53 @@
 }
 
 #pragma mark -
-#pragma mark private
+#pragma mark properties
 
-- (void)checkReachabilityFlags
+@dynamic delegate;
+
+- (NSObject <SCNetworkReachabilityDelegate> *)delegate
 {
-    if (reachabilityRef)
+    return delegate;
+}
+
+- (void)setDelegate:(NSObject<SCNetworkReachabilityDelegate> *)aDelegate
+{
+    if (!delegate && aDelegate)
     {
-        SCNetworkReachabilityFlags flags;
-        if (SCNetworkReachabilityGetFlags(reachabilityRef, &flags))
-        {
-#ifdef DEBUG
-            NSLog(@"Reachability Flag Status: %c%c %c%c%c%c%c%c%c\n",
-                  (flags & kSCNetworkReachabilityFlagsIsWWAN)				? 'W' : '-',
-                  (flags & kSCNetworkReachabilityFlagsReachable)            ? 'R' : '-',
-                  (flags & kSCNetworkReachabilityFlagsTransientConnection)  ? 't' : '-',
-                  (flags & kSCNetworkReachabilityFlagsConnectionRequired)   ? 'c' : '-',
-                  (flags & kSCNetworkReachabilityFlagsConnectionOnTraffic)  ? 'C' : '-',
-                  (flags & kSCNetworkReachabilityFlagsInterventionRequired) ? 'i' : '-',
-                  (flags & kSCNetworkReachabilityFlagsConnectionOnDemand)   ? 'D' : '-',
-                  (flags & kSCNetworkReachabilityFlagsIsLocalAddress)       ? 'l' : '-',
-                  (flags & kSCNetworkReachabilityFlagsIsDirect)             ? 'd' : '-'
-                  );
-#endif
-            [self parseReachabilityFlags:flags];
-        }
-        else
-        {
-            [error release];
-            error = [[NSError alloc] initWithDomain:SC_DOMAIN_GET_FLAGS code:SC_CODE_GET_FLAGS
-                                           userInfo:nil];
-        }
+        [SCNetworkReachabilityScheduler scheduleReachability:self withRef:reachabilityRef];
     }
-    else
+    else if (delegate && !aDelegate)
     {
-        [error release];
-        error = [[NSError alloc] initWithDomain:SC_DOMAIN_REF code:SC_CODE_REF userInfo:nil];
+        [SCNetworkReachabilityScheduler unscheduleReachabilityRef:reachabilityRef];
     }
 }
 
-- (void)parseReachabilityFlags:(SCNetworkReachabilityFlags)flags
+#pragma mark -
+#pragma mark private
+
+- (void)checkReachability
 {
-    isReachable = (flags & kSCNetworkReachabilityFlagsReachable);
-    if (isReachable)
+    SCNetworkReachabilityFlagsParser *parser = [SCNetworkReachabilityFlagsParser new];
+    if ([parser checkReachabilityRefFlags:reachabilityRef])
     {
-        device = (flags & kSCNetworkReachabilityFlagsIsWWAN) ?
-        SCNetworkDeviceCellular : SCNetworkDeviceWiFi;
+        isReachable = [parser isReachable];
+        if (isReachable)
+        {
+            device = [parser isCellular] ? SCNetworkDeviceCellular : SCNetworkDeviceWiFi;
+        }
+        else
+        {
+            device = SCNetworkDeviceNone;
+        }
     }
     else
     {
-        device = SCNetworkDeviceNone;
+        NSError *error = [[[NSError alloc] initWithDomain:SC_ERROR_DOMAIN_GET_FLAGS
+                                                     code:SC_ERROR_CODE_GET_FLAGS
+                                                 userInfo:nil] autorelease];
+        [delegate reachability:self didFail:error];
     }
+    [parser release];
 }
 
 @end

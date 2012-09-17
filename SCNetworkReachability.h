@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <netinet/in.h>
+#import "SCNetworkReachabilityDelegate.h"
 
 typedef enum
 {
@@ -21,14 +22,14 @@ SCNetworkDevice;
 @interface SCNetworkReachability : NSObject
 {
     SCNetworkReachabilityRef reachabilityRef;
+    NSObject <SCNetworkReachabilityDelegate> *delegate;
     SCNetworkDevice device;
     BOOL isReachable;
-    NSError *error;
 }
 
+@property (nonatomic, assign) NSObject <SCNetworkReachabilityDelegate> *delegate;
 @property (nonatomic, readonly) SCNetworkDevice device;
 @property (nonatomic, readonly) BOOL isReachable;
-@property (nonatomic, readonly) NSError *error;
 
 // initialization
 - (id)initWithHostName:(NSString *)hostName;
