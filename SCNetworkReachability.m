@@ -14,13 +14,9 @@
 #define SC_ERROR_DOMAIN_GET_FLAGS   @"SCNetworkReachability: Can't determine reachability flags"
 #define SC_ERROR_CODE_GET_FLAGS     501
 
-@interface SCNetworkReachability ()
-- (void)checkReachability;
-@end
-
 @implementation SCNetworkReachability
 
-@synthesize isReachable, device;
+@synthesize status;
 
 #pragma mark -
 #pragma mark main routine
@@ -88,6 +84,34 @@
 }
 
 #pragma mark -
+#pragma mark actions
+
+- (void)checkReachability
+{
+    SCNetworkReachabilityFlagsParser *parser = [SCNetworkReachabilityFlagsParser new];
+    if ([parser checkReachabilityRefFlags:reachabilityRef])
+    {
+        if ([parser isReachable])
+        {
+            status = [parser isCellular] ?
+            SCNetworkStatusReachableViaCellular : SCNetworkStatusReachableViaWiFi;
+        }
+        else
+        {
+            status = SCNetworkStatusNotReachable;
+        }
+    }
+    else
+    {
+        NSError *error = [[[NSError alloc] initWithDomain:SC_ERROR_DOMAIN_GET_FLAGS
+                                                     code:SC_ERROR_CODE_GET_FLAGS
+                                                 userInfo:nil] autorelease];
+        [delegate reachability:self didFail:error];
+    }
+    [parser release];
+}
+
+#pragma mark -
 #pragma mark properties
 
 @dynamic delegate;
@@ -107,34 +131,7 @@
     {
         [SCNetworkReachabilityScheduler unscheduleReachabilityRef:reachabilityRef];
     }
-}
-
-#pragma mark -
-#pragma mark private
-
-- (void)checkReachability
-{
-    SCNetworkReachabilityFlagsParser *parser = [SCNetworkReachabilityFlagsParser new];
-    if ([parser checkReachabilityRefFlags:reachabilityRef])
-    {
-        isReachable = [parser isReachable];
-        if (isReachable)
-        {
-            device = [parser isCellular] ? SCNetworkDeviceCellular : SCNetworkDeviceWiFi;
-        }
-        else
-        {
-            device = SCNetworkDeviceNone;
-        }
-    }
-    else
-    {
-        NSError *error = [[[NSError alloc] initWithDomain:SC_ERROR_DOMAIN_GET_FLAGS
-                                                     code:SC_ERROR_CODE_GET_FLAGS
-                                                 userInfo:nil] autorelease];
-        [delegate reachability:self didFail:error];
-    }
-    [parser release];
+    delegate = aDelegate;
 }
 
 @end

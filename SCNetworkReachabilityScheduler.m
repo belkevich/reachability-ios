@@ -89,6 +89,7 @@ static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags
     {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         SCNetworkReachability *reachability = (SCNetworkReachability *)dataObject;
+        [reachability checkReachability];
         [reachability.delegate reachabilityDidChange:reachability];
         [pool drain];
     }

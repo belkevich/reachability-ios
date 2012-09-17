@@ -12,7 +12,10 @@
 
 @protocol SCNetworkReachabilityDelegate <NSObject>
 
+@required
 - (void)reachabilityDidChange:(SCNetworkReachability *)reachability;
+
+@optional
 - (void)reachability:(SCNetworkReachability *)reachability didFail:(NSError *)error;
 
 @end

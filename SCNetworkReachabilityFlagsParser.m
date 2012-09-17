@@ -58,12 +58,12 @@
 
 - (BOOL)isReachable
 {
-    return (flags & kSCNetworkReachabilityFlagsReachable);
+    return (flags & kSCNetworkReachabilityFlagsReachable) != 0;
 }
 
 - (BOOL)isCellular
 {
-    return (flags & kSCNetworkReachabilityFlagsIsWWAN);
+    return (flags & kSCNetworkReachabilityFlagsIsWWAN) != 0;
 }
 
 @end

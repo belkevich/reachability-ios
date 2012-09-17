@@ -13,23 +13,21 @@
 
 typedef enum
 {
-    SCNetworkDeviceNone = 0,
-    SCNetworkDeviceWiFi = 1,
-    SCNetworkDeviceCellular = 2
+    SCNetworkStatusNotReachable = 0,
+    SCNetworkStatusReachableViaWiFi = 1,
+    SCNetworkStatusReachableViaCellular = 2
 }
-SCNetworkDevice;
+SCNetworkStatus;
 
 @interface SCNetworkReachability : NSObject
 {
     SCNetworkReachabilityRef reachabilityRef;
     NSObject <SCNetworkReachabilityDelegate> *delegate;
-    SCNetworkDevice device;
-    BOOL isReachable;
+    SCNetworkStatus status;
 }
 
 @property (nonatomic, assign) NSObject <SCNetworkReachabilityDelegate> *delegate;
-@property (nonatomic, readonly) SCNetworkDevice device;
-@property (nonatomic, readonly) BOOL isReachable;
+@property (nonatomic, readonly) SCNetworkStatus status;
 
 // initialization
 - (id)initWithHostName:(NSString *)hostName;
@@ -39,5 +37,7 @@ SCNetworkDevice;
 + (SCNetworkReachability *)reachabilityWithHostName:(NSString *)hostName;
 + (SCNetworkReachability *)reachabilityWithHostAddress:(const struct sockaddr_in *)hostAddress;
 + (SCNetworkReachability *)reachabilityForLocalWiFi;
+// actions
+- (void)checkReachability;
 
 @end
