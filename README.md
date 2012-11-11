@@ -10,8 +10,7 @@ Add 'reachability-iOS' as git submodule to your project:
 	cd <project source directory>
 	git submodule add https://github.com/belkevich/reachability-ios.git <submodules directory>
 
-Then add files to your XCode project
-And add `SystemConfiguration.framework` 
+Then add files to your XCode project. And add `SystemConfiguration.framework` 
 to your `Target` -> `Build phases` -> `Link Binary With Libraries`
 
 # Using
