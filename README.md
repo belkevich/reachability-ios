@@ -29,7 +29,7 @@ else
 
 ## Check is connection via Wi-Fi or Cellular
 
-```objectiv-c
+``` objective-c
 if (reachability.status == SCNetworkStatusViaCellular)
 {
 	// internet connection via cellular
@@ -45,7 +45,7 @@ else if (reachability.status == SCNetworkStatusViaWiFi)
 
 Class that will be check changes should implement `SCNetworkReachabilityDelegate` protocol methods:
 
-```objective-c
+``` objective-c
 @required
 - (void)reachabilityDidChange:(SCNetworkReachability *)reachability;
 
@@ -56,6 +56,6 @@ Class that will be check changes should implement `SCNetworkReachabilityDelegate
 
 And set reachability instance delegate to self
 
-```objective-c
+``` objective-c
 reachability.delegate = self;
 ```
