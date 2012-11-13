@@ -5,7 +5,14 @@ Network reachability for iOS
 SCNetworkReachability class is the wrapper on C-structures and C-functions of [SCNetworkReachability API](https://developer.apple.com/library/mac/#documentation/SystemConfiguration/Reference/SCNetworkReachabilityRef/Reference/reference.html#//apple_ref/doc/uid/TP40007260) in [SystemConfiguration.framework](https://developer.apple.com/library/mac/#documentation/Networking/Reference/SysConfig/_index.html#//apple_ref/doc/uid/TP40001027)
 
 # Installation
-Add 'reachability-iOS' as git submodule to your project:
+## 1. Installing with cocoa pods
+
+Add to [Podfile](https://github.com/CocoaPods/CocoaPods/wiki/A-Podfile)
+`pod 'SCNetworkReachability'`
+And run command
+`pod install`
+
+## 2. Add as git submodule
 
 	cd <project source directory>
 	git submodule add https://github.com/belkevich/reachability-ios.git <submodules directory>
@@ -28,7 +35,7 @@ else
 }
 ```
 
-## Check is connection via Wi-Fi or Cellular
+## Check is connection Wi-Fi or Cellular
 
 ``` objective-c
 SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostName:@"www.apple.com"];
