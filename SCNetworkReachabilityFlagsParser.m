@@ -50,8 +50,8 @@
               (flags & kSCNetworkReachabilityFlagsIsLocalAddress)       ? 'l' : '-',
               (flags & kSCNetworkReachabilityFlagsIsDirect)             ? 'd' : '-'
               );
-        return YES;
 #endif
+        return YES;
     }
     return NO;
 }
