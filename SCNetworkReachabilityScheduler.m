@@ -17,13 +17,15 @@
 SCNetworkReachability instance"
 
 @interface SCNetworkReachabilityScheduler ()
+
 + (BOOL)setCallbackForReachability:(SCNetworkReachability *)reachability
                            withRef:(SCNetworkReachabilityRef)ref;
 + (void)scheduleInRunLoopReachability:(SCNetworkReachability *)reachability
                               withRef:(SCNetworkReachabilityRef)ref;
+@end
+
 // callback
 static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void *data);
-@end
 
 @implementation SCNetworkReachabilityScheduler
 
@@ -55,22 +57,22 @@ static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags
                            withRef:(SCNetworkReachabilityRef)ref
 {
     SCNetworkReachabilityContext context = {0, (__bridge void *)(reachability), NULL, NULL, NULL};
-	if(!SCNetworkReachabilitySetCallback(ref, callback, &context))
-	{
+    if (!SCNetworkReachabilitySetCallback(ref, callback, &context))
+    {
         NSError *error = [NSError errorWithDomain:SC_SCHEDULER_ERROR_DOMAIN_CALLBACK
                                              code:SC_SCHEDULER_ERROR_CODE_CALLBACK
                                          userInfo:nil];
         [reachability.delegate reachability:reachability didFail:error];
         return NO;
-	}
+    }
     return YES;
 }
 
 + (void)scheduleInRunLoopReachability:(SCNetworkReachability *)reachability
                               withRef:(SCNetworkReachabilityRef)ref
 {
-    if(!SCNetworkReachabilityScheduleWithRunLoop(ref, CFRunLoopGetCurrent(),
-                                                 kCFRunLoopDefaultMode))
+    if (!SCNetworkReachabilityScheduleWithRunLoop(ref, CFRunLoopGetCurrent(),
+                                                  kCFRunLoopDefaultMode))
     {
         NSError *error = [NSError errorWithDomain:SC_SCHEDULER_ERROR_DOMAIN_SCHEDULE
                                              code:SC_SCHEDULER_ERROR_CODE_SCHEDULE
@@ -87,7 +89,8 @@ static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags
     NSObject *dataObject = (__bridge NSObject *)data;
     if ([dataObject isKindOfClass:[SCNetworkReachability class]])
     {
-        @autoreleasepool {
+        @autoreleasepool
+        {
             SCNetworkReachability *reachability = (SCNetworkReachability *)dataObject;
             [reachability checkReachability];
             [reachability.delegate reachabilityDidChange:reachability];

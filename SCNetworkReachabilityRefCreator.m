@@ -35,10 +35,10 @@
 + (SCNetworkReachabilityRef)newReachabilityRefForLocalWiFi
 {
     struct sockaddr_in localWifiAddress;
-	bzero(&localWifiAddress, sizeof(localWifiAddress));
-	localWifiAddress.sin_len = sizeof(localWifiAddress);
-	localWifiAddress.sin_family = AF_INET;
-	localWifiAddress.sin_addr.s_addr = htonl(IN_LINKLOCALNETNUM);
+    bzero(&localWifiAddress, sizeof(localWifiAddress));
+    localWifiAddress.sin_len = sizeof(localWifiAddress);
+    localWifiAddress.sin_family = AF_INET;
+    localWifiAddress.sin_addr.s_addr = htonl(IN_LINKLOCALNETNUM);
     return [self newReachabilityRefWithHostAddress:&localWifiAddress];
 }
 

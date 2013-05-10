@@ -92,8 +92,8 @@
     {
         if ([parser isReachable])
         {
-            status = [parser isCellular] ?
-            SCNetworkStatusReachableViaCellular : SCNetworkStatusReachableViaWiFi;
+            status = [parser isCellular] ? SCNetworkStatusReachableViaCellular :
+                     SCNetworkStatusReachableViaWiFi;
         }
         else
         {
@@ -103,8 +103,8 @@
     else
     {
         NSError *error = [[NSError alloc] initWithDomain:SC_ERROR_DOMAIN_GET_FLAGS
-                                                     code:SC_ERROR_CODE_GET_FLAGS
-                                                 userInfo:nil];
+                                                    code:SC_ERROR_CODE_GET_FLAGS
+                                                userInfo:nil];
         [delegate reachability:self didFail:error];
     }
 }
@@ -119,7 +119,7 @@
     return delegate;
 }
 
-- (void)setDelegate:(NSObject<SCNetworkReachabilityDelegate> *)aDelegate
+- (void)setDelegate:(NSObject <SCNetworkReachabilityDelegate> *)aDelegate
 {
     if (!delegate && aDelegate)
     {
@@ -130,6 +130,7 @@
         [SCNetworkReachabilityScheduler unscheduleReachabilityRef:reachabilityRef];
     }
     delegate = aDelegate;
+    [aDelegate reachabilityDidChange:self];
 }
 
 @end

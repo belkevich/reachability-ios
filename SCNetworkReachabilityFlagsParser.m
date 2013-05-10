@@ -40,16 +40,15 @@
     {
 #ifdef DEBUG
         NSLog(@"Reachability Flag Status: %c%c %c%c%c%c%c%c%c\n",
-              (flags & kSCNetworkReachabilityFlagsIsWWAN)				? 'W' : '-',
-              (flags & kSCNetworkReachabilityFlagsReachable)            ? 'R' : '-',
-              (flags & kSCNetworkReachabilityFlagsTransientConnection)  ? 't' : '-',
-              (flags & kSCNetworkReachabilityFlagsConnectionRequired)   ? 'c' : '-',
-              (flags & kSCNetworkReachabilityFlagsConnectionOnTraffic)  ? 'C' : '-',
+              (flags & kSCNetworkReachabilityFlagsIsWWAN) ? 'W' : '-',
+              (flags & kSCNetworkReachabilityFlagsReachable) ? 'R' : '-',
+              (flags & kSCNetworkReachabilityFlagsTransientConnection) ? 't' : '-',
+              (flags & kSCNetworkReachabilityFlagsConnectionRequired) ? 'c' : '-',
+              (flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) ? 'C' : '-',
               (flags & kSCNetworkReachabilityFlagsInterventionRequired) ? 'i' : '-',
-              (flags & kSCNetworkReachabilityFlagsConnectionOnDemand)   ? 'D' : '-',
-              (flags & kSCNetworkReachabilityFlagsIsLocalAddress)       ? 'l' : '-',
-              (flags & kSCNetworkReachabilityFlagsIsDirect)             ? 'd' : '-'
-              );
+              (flags & kSCNetworkReachabilityFlagsConnectionOnDemand) ? 'D' : '-',
+              (flags & kSCNetworkReachabilityFlagsIsLocalAddress) ? 'l' : '-',
+              (flags & kSCNetworkReachabilityFlagsIsDirect) ? 'd' : '-');
 #endif
         return YES;
     }

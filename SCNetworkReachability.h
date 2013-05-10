@@ -16,8 +16,7 @@ typedef enum
     SCNetworkStatusNotReachable = 0,
     SCNetworkStatusReachableViaWiFi = 1,
     SCNetworkStatusReachableViaCellular = 2
-}
-SCNetworkStatus;
+} SCNetworkStatus;
 
 @interface SCNetworkReachability : NSObject
 {
