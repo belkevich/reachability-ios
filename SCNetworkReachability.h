@@ -26,7 +26,7 @@ SCNetworkStatus;
     SCNetworkStatus status;
 }
 
-@property (nonatomic, assign) NSObject <SCNetworkReachabilityDelegate> *delegate;
+@property (nonatomic, weak) NSObject <SCNetworkReachabilityDelegate> *delegate;
 @property (nonatomic, readonly) SCNetworkStatus status;
 
 // initialization

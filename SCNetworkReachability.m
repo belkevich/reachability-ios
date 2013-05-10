@@ -62,7 +62,6 @@
         [SCNetworkReachabilityScheduler unscheduleReachabilityRef:reachabilityRef];
     }
     CFRelease(reachabilityRef);
-    [super dealloc];
 }
 
 #pragma mark -
@@ -70,17 +69,17 @@
 
 + (SCNetworkReachability *)reachabilityWithHostName:(NSString *)hostName
 {
-    return [[[SCNetworkReachability alloc] initWithHostName:hostName] autorelease];
+    return [[SCNetworkReachability alloc] initWithHostName:hostName];
 }
 
 + (SCNetworkReachability *)reachabilityWithHostAddress:(const struct sockaddr_in *)hostAddress
 {
-    return [[[SCNetworkReachability alloc] initWithHostAddress:hostAddress] autorelease];
+    return [[SCNetworkReachability alloc] initWithHostAddress:hostAddress];
 }
 
 + (SCNetworkReachability *)reachabilityForLocalWiFi
 {
-    return [[[SCNetworkReachability alloc] initForLocalWiFi] autorelease];
+    return [[SCNetworkReachability alloc] initForLocalWiFi];
 }
 
 #pragma mark -
@@ -103,12 +102,11 @@
     }
     else
     {
-        NSError *error = [[[NSError alloc] initWithDomain:SC_ERROR_DOMAIN_GET_FLAGS
+        NSError *error = [[NSError alloc] initWithDomain:SC_ERROR_DOMAIN_GET_FLAGS
                                                      code:SC_ERROR_CODE_GET_FLAGS
-                                                 userInfo:nil] autorelease];
+                                                 userInfo:nil];
         [delegate reachability:self didFail:error];
     }
-    [parser release];
 }
 
 #pragma mark -

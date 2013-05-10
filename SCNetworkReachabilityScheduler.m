@@ -54,7 +54,7 @@ static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags
 + (BOOL)setCallbackForReachability:(SCNetworkReachability *)reachability
                            withRef:(SCNetworkReachabilityRef)ref
 {
-    SCNetworkReachabilityContext context = {0, reachability, NULL, NULL, NULL};
+    SCNetworkReachabilityContext context = {0, (__bridge void *)(reachability), NULL, NULL, NULL};
 	if(!SCNetworkReachabilitySetCallback(ref, callback, &context))
 	{
         NSError *error = [NSError errorWithDomain:SC_SCHEDULER_ERROR_DOMAIN_CALLBACK
@@ -84,14 +84,14 @@ static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags
 
 static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void *data)
 {
-    NSObject *dataObject = (NSObject *)data;
+    NSObject *dataObject = (__bridge NSObject *)data;
     if ([dataObject isKindOfClass:[SCNetworkReachability class]])
     {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        SCNetworkReachability *reachability = (SCNetworkReachability *)dataObject;
-        [reachability checkReachability];
-        [reachability.delegate reachabilityDidChange:reachability];
-        [pool drain];
+        @autoreleasepool {
+            SCNetworkReachability *reachability = (SCNetworkReachability *)dataObject;
+            [reachability checkReachability];
+            [reachability.delegate reachabilityDidChange:reachability];
+        }
     }
     else
     {
