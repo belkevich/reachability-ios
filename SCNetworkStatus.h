@@ -1,5 +1,8 @@
 //
-//  Created by Alexey Belkevich on 5/12/13.
+//  SCNetworkStatus.h
+//  SCNetworkReachability
+//
+//  Created by Alexey Belkevich on 12/05/13
 //  Copyright (c) 2013 okolodev. All rights reserved.
 //
 

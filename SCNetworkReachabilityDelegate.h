@@ -2,8 +2,8 @@
 //  SCNetworkReachabilityProtocol.h
 //  SCNetworkReachability
 //
-//  Created by Alexey Belkevich on 9/3/12.
-//  Copyright (c) 2012 ClockworkIdeas. All rights reserved.
+//  Created by Alexey Belkevich on 12/05/13
+//  Copyright (c) 2013 okolodev. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
