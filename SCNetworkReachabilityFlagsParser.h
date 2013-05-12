@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <SystemConfiguration/SystemConfiguration.h>
+#import "SCNetworkStatus.h"
 
 @interface SCNetworkReachabilityFlagsParser : NSObject
 {
@@ -16,10 +17,9 @@
 }
 
 // initialization
+- (id)initWithReachabilityFlags:(SCNetworkReachabilityFlags)aFlags;
 - (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef;
 // actions
-- (BOOL)checkReachabilityRefFlags:(SCNetworkReachabilityRef)reachabilityRef;
-- (BOOL)isReachable;
-- (BOOL)isCellular;
+- (SCNetworkStatus)status;
 
 @end

@@ -7,41 +7,65 @@
 //
 
 #import "SCNetworkReachabilityScheduler.h"
-#import "SCNetworkReachability.h"
+#import "SCNetworkReachabilityFlagsParser.h"
 
 #define SC_SCHEDULER_ERROR_DOMAIN_SCHEDULE  @"SCNetworkReachability: Failed to schedule"
 #define SC_SCHEDULER_ERROR_CODE_SCHEDULE    502
 #define SC_SCHEDULER_ERROR_DOMAIN_CALLBACK  @"SCNetworkReachability: Failed to set callback"
 #define SC_SCHEDULER_ERROR_CODE_CALLBACK    503
-#define SC_SCHEDULER_EXCEPTION_CALLBACK     @"SCNetworkReachabilityScheduler: received data is not \
-SCNetworkReachability instance"
+
+static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
+                                       SCNetworkReachabilityFlags flags, void *data);
 
 @interface SCNetworkReachabilityScheduler ()
 
-+ (BOOL)setCallbackForReachability:(SCNetworkReachability *)reachability
-                           withRef:(SCNetworkReachabilityRef)ref;
-+ (void)scheduleInRunLoopReachability:(SCNetworkReachability *)reachability
-                              withRef:(SCNetworkReachabilityRef)ref;
+- (void)scheduleReachabilityRef;
+- (void)unscheduleReachabilityRef;
+- (BOOL)setCallbackForReachabilityRef;
+- (void)setRunLoopForReachabilityRef;
+
 @end
 
-// callback
-static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void *data);
 
 @implementation SCNetworkReachabilityScheduler
 
 #pragma mark -
-#pragma mark actions
+#pragma mark main routine
 
-+ (void)scheduleReachability:(SCNetworkReachability *)reachability
-                     withRef:(SCNetworkReachabilityRef)ref
+- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)aRef
+                     delegate:(NSObject <SCNetworkReachabilityDelegate> *)aDelegate
 {
-    if ([self setCallbackForReachability:reachability withRef:ref])
+    self = [super init];
+    if (self)
     {
-        [self scheduleInRunLoopReachability:reachability withRef:ref];
+        ref = aRef;
+        delegate = aDelegate;
+        [self scheduleReachabilityRef];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [self unscheduleReachabilityRef];
+    if (ref)
+    {
+        CFRelease(ref);
     }
 }
 
-+ (void)unscheduleReachabilityRef:(SCNetworkReachabilityRef)ref
+#pragma mark -
+#pragma mark actions
+
+- (void)scheduleReachabilityRef
+{
+    if ([self setCallbackForReachabilityRef])
+    {
+        [self setRunLoopForReachabilityRef];
+    }
+}
+
+- (void)unscheduleReachabilityRef
 {
     if (ref)
     {
@@ -53,23 +77,21 @@ static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags
 #pragma mark -
 #pragma mark private
 
-+ (BOOL)setCallbackForReachability:(SCNetworkReachability *)reachability
-                           withRef:(SCNetworkReachabilityRef)ref
+- (BOOL)setCallbackForReachabilityRef
 {
-    SCNetworkReachabilityContext context = {0, (__bridge void *)(reachability), NULL, NULL, NULL};
-    if (!SCNetworkReachabilitySetCallback(ref, callback, &context))
+    SCNetworkReachabilityContext context = {0, (__bridge void *)(delegate), NULL, NULL, NULL};
+    if (!SCNetworkReachabilitySetCallback(ref, callbackForReachabilityRef, &context))
     {
         NSError *error = [NSError errorWithDomain:SC_SCHEDULER_ERROR_DOMAIN_CALLBACK
                                              code:SC_SCHEDULER_ERROR_CODE_CALLBACK
                                          userInfo:nil];
-        [reachability.delegate reachability:reachability didFail:error];
+        [delegate reachabilityDidFail:error];
         return NO;
     }
     return YES;
 }
 
-+ (void)scheduleInRunLoopReachability:(SCNetworkReachability *)reachability
-                              withRef:(SCNetworkReachabilityRef)ref
+- (void)setRunLoopForReachabilityRef
 {
     if (!SCNetworkReachabilityScheduleWithRunLoop(ref, CFRunLoopGetCurrent(),
                                                   kCFRunLoopDefaultMode))
@@ -77,30 +99,23 @@ static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags
         NSError *error = [NSError errorWithDomain:SC_SCHEDULER_ERROR_DOMAIN_SCHEDULE
                                              code:SC_SCHEDULER_ERROR_CODE_SCHEDULE
                                          userInfo:nil];
-        [reachability.delegate reachability:reachability didFail:error];
+        [delegate reachabilityDidFail:error];
     }
 }
 
 #pragma mark -
 #pragma mark callback
 
-static void callback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void *data)
+static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
+                                       SCNetworkReachabilityFlags flags, void *data)
 {
-    NSObject *dataObject = (__bridge NSObject *)data;
-    if ([dataObject isKindOfClass:[SCNetworkReachability class]])
+    @autoreleasepool
     {
-        @autoreleasepool
-        {
-            SCNetworkReachability *reachability = (SCNetworkReachability *)dataObject;
-            [reachability checkReachability];
-            [reachability.delegate reachabilityDidChange:reachability];
-        }
-    }
-    else
-    {
-        @throw [NSException exceptionWithName:SC_SCHEDULER_EXCEPTION_CALLBACK
-                                       reason:SC_SCHEDULER_EXCEPTION_CALLBACK
-                                     userInfo:nil];
+        NSObject <SCNetworkReachabilityDelegate> *delegate;
+        delegate = (__bridge NSObject <SCNetworkReachabilityDelegate> *)data;
+        SCNetworkReachabilityFlagsParser *parser = [[SCNetworkReachabilityFlagsParser alloc]
+                                                     initWithReachabilityFlags:flags];
+        [delegate reachabilityDidChange:[parser status]];
     }
 }
 

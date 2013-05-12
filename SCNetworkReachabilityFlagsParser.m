@@ -8,36 +8,24 @@
 
 #import "SCNetworkReachabilityFlagsParser.h"
 
-#define SC_FLAGS_PARSER_EXCEPTION_REF   @"SCNetworkReachabilityFlagsParser: reachability ref is empty"
+@interface SCNetworkReachabilityFlagsParser ()
+
+- (BOOL)isReachable;
+- (BOOL)isCellular;
+
+@end
 
 @implementation SCNetworkReachabilityFlagsParser
 
 #pragma mark -
 #pragma mark main routine
 
-- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef
+- (id)initWithReachabilityFlags:(SCNetworkReachabilityFlags)aFlags
 {
-    if (!reachabilityRef)
-    {
-        @throw [NSException exceptionWithName:SC_FLAGS_PARSER_EXCEPTION_REF
-                                       reason:SC_FLAGS_PARSER_EXCEPTION_REF
-                                     userInfo:nil];
-    }
     self = [super init];
     if (self)
     {
-        [self checkReachabilityRefFlags:reachabilityRef];
-    }
-    return self;
-}
-
-#pragma mark -
-#pragma mark actions
-
-- (BOOL)checkReachabilityRefFlags:(SCNetworkReachabilityRef)reachabilityRef
-{
-    if (SCNetworkReachabilityGetFlags(reachabilityRef, &flags))
-    {
+        flags = aFlags;
 #ifdef DEBUG
         NSLog(@"Reachability Flag Status: %c%c %c%c%c%c%c%c%c\n",
               (flags & kSCNetworkReachabilityFlagsIsWWAN) ? 'W' : '-',
@@ -50,13 +38,36 @@
               (flags & kSCNetworkReachabilityFlagsIsLocalAddress) ? 'l' : '-',
               (flags & kSCNetworkReachabilityFlagsIsDirect) ? 'd' : '-');
 #endif
-        return YES;
+    }
+    return self;
+}
+
+
+- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef
+{
+    SCNetworkReachabilityFlags aFlags;
+    SCNetworkReachabilityGetFlags(reachabilityRef, &aFlags);
+    return [self initWithReachabilityFlags:aFlags];
+}
+
+#pragma mark -
+#pragma mark actions
+
+- (SCNetworkStatus)status
+{
+    if ([self isReachable])
+    {
+        return [self isCellular] ? SCNetworkStatusReachableViaCellular :
+               SCNetworkStatusReachableViaWiFi;
     }
     else
     {
-        return NO;
+        return SCNetworkStatusNotReachable;
     }
 }
+
+#pragma mark -
+#pragma mark private
 
 - (BOOL)isReachable
 {

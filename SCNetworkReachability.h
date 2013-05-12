@@ -7,26 +7,24 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <SystemConfiguration/SystemConfiguration.h>
 #import <netinet/in.h>
 #import "SCNetworkReachabilityDelegate.h"
+#import "SCNetworkStatus.h"
 
-typedef enum
-{
-    SCNetworkStatusNotReachable = 0,
-    SCNetworkStatusReachableViaWiFi = 1,
-    SCNetworkStatusReachableViaCellular = 2
-} SCNetworkStatus;
+typedef void (^SCNetworkReachabilityChanged)(SCNetworkStatus status);
+typedef void (^SCNetworkReachabilityFailed)(NSError *error);
+
+@class SCNetworkReachabilityScheduler;
 
 @interface SCNetworkReachability : NSObject
 {
-    SCNetworkReachabilityRef reachabilityRef;
-    NSObject <SCNetworkReachabilityDelegate> *delegate;
-    SCNetworkStatus status;
+    SCNetworkReachabilityScheduler *scheduler;
 }
 
-@property (nonatomic, weak) NSObject <SCNetworkReachabilityDelegate> *delegate;
-@property (nonatomic, readonly) SCNetworkStatus status;
+@property (nonatomic, weak, readwrite) NSObject <SCNetworkReachabilityDelegate> *delegate;
+@property (nonatomic, strong, readwrite) SCNetworkReachabilityChanged changedBlock;
+@property (nonatomic, strong, readwrite) SCNetworkReachabilityFailed failedBlock;
+@property (nonatomic, assign, readonly) SCNetworkStatus status;
 
 // initialization
 - (id)initWithHostName:(NSString *)hostName;
@@ -36,7 +34,5 @@ typedef enum
 + (SCNetworkReachability *)reachabilityWithHostName:(NSString *)hostName;
 + (SCNetworkReachability *)reachabilityWithHostAddress:(const struct sockaddr_in *)hostAddress;
 + (SCNetworkReachability *)reachabilityForLocalWiFi;
-// actions
-- (void)checkReachability;
 
 @end

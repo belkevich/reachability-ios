@@ -7,15 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-
-@class SCNetworkReachability;
+#import "SCNetworkStatus.h"
 
 @protocol SCNetworkReachabilityDelegate <NSObject>
 
 @required
-- (void)reachabilityDidChange:(SCNetworkReachability *)reachability;
+- (void)reachabilityDidChange:(SCNetworkStatus)status;
 
 @optional
-- (void)reachability:(SCNetworkReachability *)reachability didFail:(NSError *)error;
+- (void)reachabilityDidFail:(NSError *)error;
 
 @end

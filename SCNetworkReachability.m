@@ -7,61 +7,55 @@
 //
 
 #import "SCNetworkReachability.h"
-#import "SCNetworkReachabilityRefCreator.h"
-#import "SCNetworkReachabilityFlagsParser.h"
 #import "SCNetworkReachabilityScheduler.h"
+#import "SCNetworkReachabilityRefBuilder.h"
+#import "SCNetworkReachabilityFlagsParser.h"
 
-#define SC_ERROR_DOMAIN_GET_FLAGS   @"SCNetworkReachability: Can't determine reachability flags"
-#define SC_ERROR_CODE_GET_FLAGS     501
+
+@interface SCNetworkReachability () <SCNetworkReachabilityDelegate>
+
+@property (nonatomic, assign, readwrite) SCNetworkStatus status;
+
+@end
 
 @implementation SCNetworkReachability
-
-@synthesize status;
 
 #pragma mark -
 #pragma mark main routine
 
-- (id)initWithHostName:(NSString *)hostName
+- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef
 {
-    self = [super init];
+    self = [self init];
     if (self)
     {
-        reachabilityRef = [SCNetworkReachabilityRefCreator newReachabilityRefWithHostName:hostName];
-        [self checkReachability];
+        scheduler = [[SCNetworkReachabilityScheduler alloc] initWithReachabilityRef:reachabilityRef
+                                                                           delegate:self];
+        SCNetworkReachabilityFlagsParser *parser = [[SCNetworkReachabilityFlagsParser alloc]
+                                                     initWithReachabilityRef:reachabilityRef];
+        self.status = [parser status];
     }
     return self;
+}
+
+- (id)initWithHostName:(NSString *)hostName
+{
+    SCNetworkReachabilityRef reachabilityRef;
+    reachabilityRef = [SCNetworkReachabilityRefBuilder reachabilityRefWithHostName:hostName];
+    return [self initWithReachabilityRef:reachabilityRef];
 }
 
 - (id)initWithHostAddress:(const struct sockaddr_in *)hostAddress
 {
-    self = [super init];
-    if (self)
-    {
-        reachabilityRef = [SCNetworkReachabilityRefCreator
-                           newReachabilityRefWithHostAddress:hostAddress];
-        [self checkReachability];
-    }
-    return self;
+    SCNetworkReachabilityRef reachabilityRef;
+    reachabilityRef = [SCNetworkReachabilityRefBuilder reachabilityRefWithHostAddress:hostAddress];
+    return [self initWithReachabilityRef:reachabilityRef];
 }
 
 - (id)initForLocalWiFi
 {
-    self = [super init];
-    if (self)
-    {
-        reachabilityRef = [SCNetworkReachabilityRefCreator newReachabilityRefForLocalWiFi];
-        [self checkReachability];
-    }
-    return self;
-}
-
-- (void)dealloc
-{
-    if (delegate)
-    {
-        [SCNetworkReachabilityScheduler unscheduleReachabilityRef:reachabilityRef];
-    }
-    CFRelease(reachabilityRef);
+    SCNetworkReachabilityRef reachabilityRef;
+    reachabilityRef = [SCNetworkReachabilityRefBuilder reachabilityRefForLocalWiFi];
+    return [self initWithReachabilityRef:reachabilityRef];
 }
 
 #pragma mark -
@@ -83,54 +77,31 @@
 }
 
 #pragma mark -
-#pragma mark actions
+#pragma mark network reachability delegate implementation
 
-- (void)checkReachability
+- (void)reachabilityDidChange:(SCNetworkStatus)status
 {
-    SCNetworkReachabilityFlagsParser *parser = [SCNetworkReachabilityFlagsParser new];
-    if ([parser checkReachabilityRefFlags:reachabilityRef])
+    self.status = status;
+    if (self.delegate)
     {
-        if ([parser isReachable])
-        {
-            status = [parser isCellular] ? SCNetworkStatusReachableViaCellular :
-                     SCNetworkStatusReachableViaWiFi;
-        }
-        else
-        {
-            status = SCNetworkStatusNotReachable;
-        }
+        [self.delegate reachabilityDidChange:status];
     }
-    else
+    else if (self.changedBlock)
     {
-        NSError *error = [[NSError alloc] initWithDomain:SC_ERROR_DOMAIN_GET_FLAGS
-                                                    code:SC_ERROR_CODE_GET_FLAGS
-                                                userInfo:nil];
-        [delegate reachability:self didFail:error];
+        self.changedBlock(status);
     }
 }
 
-#pragma mark -
-#pragma mark properties
-
-@dynamic delegate;
-
-- (NSObject <SCNetworkReachabilityDelegate> *)delegate
+- (void)reachabilityDidFail:(NSError *)error
 {
-    return delegate;
-}
-
-- (void)setDelegate:(NSObject <SCNetworkReachabilityDelegate> *)aDelegate
-{
-    if (!delegate && aDelegate)
+    if ([self.delegate respondsToSelector:@selector(reachabilityDidFail:)])
     {
-        [SCNetworkReachabilityScheduler scheduleReachability:self withRef:reachabilityRef];
+        [self.delegate reachabilityDidFail:error];
     }
-    else if (delegate && !aDelegate)
+    else if (self.failedBlock)
     {
-        [SCNetworkReachabilityScheduler unscheduleReachabilityRef:reachabilityRef];
+        self.failedBlock(error);
     }
-    delegate = aDelegate;
-    [aDelegate reachabilityDidChange:self];
 }
 
 @end

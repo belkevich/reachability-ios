@@ -8,14 +8,17 @@
 
 #import <Foundation/Foundation.h>
 #import <SystemConfiguration/SystemConfiguration.h>
+#import "SCNetworkReachabilityDelegate.h"
 
-@class SCNetworkReachability;
 
 @interface SCNetworkReachabilityScheduler : NSObject
+{
+    SCNetworkReachabilityRef ref;
+    __weak NSObject <SCNetworkReachabilityDelegate> *delegate;
+}
 
-// actions
-+ (void)scheduleReachability:(SCNetworkReachability *)reachability
-                     withRef:(SCNetworkReachabilityRef)ref;
-+ (void)unscheduleReachabilityRef:(SCNetworkReachabilityRef)ref;
+// initialization
+- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)aRef
+                     delegate:(NSObject <SCNetworkReachabilityDelegate> *)aDelegate;
 
 @end
