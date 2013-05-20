@@ -9,12 +9,14 @@
 #import "SCNetworkReachability.h"
 #import "SCNetworkReachabilityScheduler.h"
 #import "SCNetworkReachabilityRefBuilder.h"
-#import "SCNetworkReachabilityFlagsParser.h"
 
-
-@interface SCNetworkReachability () <SCNetworkReachabilityDelegate>
+@interface SCNetworkReachability ()
 
 @property (nonatomic, assign, readwrite) SCNetworkStatus status;
+@property (nonatomic, strong, readwrite) id observer;
+
+- (void)observeReachabilityChangedNotificationName:(NSString *)name;
+- (void)reachabilityChangedNotification:(NSNotification *)notification;
 
 @end
 
@@ -28,13 +30,15 @@
     self = [self init];
     if (self)
     {
-        scheduler = [[SCNetworkReachabilityScheduler alloc] initWithReachabilityRef:reachabilityRef
-                                                                           delegate:self];
-        SCNetworkReachabilityFlagsParser *parser = [[SCNetworkReachabilityFlagsParser alloc]
-                                                     initWithReachabilityRef:reachabilityRef];
-        self.status = [parser status];
+        self.status = SCNetworkStatusUndefined;
+        scheduler = [[SCNetworkReachabilityScheduler alloc] initWithReachabilityRef:reachabilityRef];
+        [self observeReachabilityChangedNotificationName:scheduler.notificationName];
+        if ([scheduler startReachabilityObserver])
+        {
+            return self;
+        }
     }
-    return self;
+    return nil;
 }
 
 - (id)initWithHostName:(NSString *)hostName
@@ -46,7 +50,7 @@
 
 - (id)initWithHostAddress:(const struct sockaddr_in *)hostAddress
 {
-    SCNetworkReachabilityRef reachabilityRef;
+    SCNetworkReachabilityRef reachabilityRef = nil;
     reachabilityRef = [SCNetworkReachabilityRefBuilder reachabilityRefWithHostAddress:hostAddress];
     return [self initWithReachabilityRef:reachabilityRef];
 }
@@ -56,6 +60,11 @@
     SCNetworkReachabilityRef reachabilityRef;
     reachabilityRef = [SCNetworkReachabilityRefBuilder reachabilityRefForLocalWiFi];
     return [self initWithReachabilityRef:reachabilityRef];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self.observer];
 }
 
 #pragma mark -
@@ -77,30 +86,32 @@
 }
 
 #pragma mark -
-#pragma mark network reachability delegate implementation
+#pragma mark private
 
-- (void)reachabilityDidChange:(SCNetworkStatus)status
+- (void)observeReachabilityChangedNotificationName:(NSString *)name
 {
-    self.status = status;
+    __weak SCNetworkReachability *weakSelf = self;
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    NSOperationQueue *queue = [NSOperationQueue currentQueue];
+    self.observer = [center addObserverForName:name object:nil queue:queue
+                                    usingBlock:^(NSNotification *notification)
+    {
+        [weakSelf reachabilityChangedNotification:notification];
+    }];
+}
+
+
+- (void)reachabilityChangedNotification:(NSNotification *)notification
+{
+    NSNumber *number = notification.object;
+    self.status = (SCNetworkStatus)[number integerValue];
     if (self.delegate)
     {
-        [self.delegate reachabilityDidChange:status];
+        [self.delegate reachabilityDidChange:self.status];
     }
     else if (self.changedBlock)
     {
-        self.changedBlock(status);
-    }
-}
-
-- (void)reachabilityDidFail:(NSError *)error
-{
-    if ([self.delegate respondsToSelector:@selector(reachabilityDidFail:)])
-    {
-        [self.delegate reachabilityDidFail:error];
-    }
-    else if (self.failedBlock)
-    {
-        self.failedBlock(error);
+        self.changedBlock(self.status);
     }
 }
 

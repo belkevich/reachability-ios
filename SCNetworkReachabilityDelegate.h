@@ -14,7 +14,4 @@
 @required
 - (void)reachabilityDidChange:(SCNetworkStatus)status;
 
-@optional
-- (void)reachabilityDidFail:(NSError *)error;
-
 @end

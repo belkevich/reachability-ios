@@ -9,23 +9,16 @@
 #import "SCNetworkReachabilityScheduler.h"
 #import "SCNetworkReachabilityFlagsParser.h"
 
-#define SC_SCHEDULER_ERROR_DOMAIN_SCHEDULE  @"SCNetworkReachability: Failed to schedule"
-#define SC_SCHEDULER_ERROR_CODE_SCHEDULE    502
-#define SC_SCHEDULER_ERROR_DOMAIN_CALLBACK  @"SCNetworkReachability: Failed to set callback"
-#define SC_SCHEDULER_ERROR_CODE_CALLBACK    503
+NSString const *kSCNetworkReachabilityChangedNotification = @"SCNetworkReachabilityChanged";
 
 static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
                                        SCNetworkReachabilityFlags flags, void *data);
 
 @interface SCNetworkReachabilityScheduler ()
 
-- (void)scheduleReachabilityRef;
-- (void)unscheduleReachabilityRef;
-- (BOOL)setCallbackForReachabilityRef;
-- (void)setRunLoopForReachabilityRef;
+@property (nonatomic, weak, readonly) dispatch_queue_t queue;
 
 @end
-
 
 @implementation SCNetworkReachabilityScheduler
 
@@ -33,23 +26,20 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
 #pragma mark main routine
 
 - (id)initWithReachabilityRef:(SCNetworkReachabilityRef)aRef
-                     delegate:(NSObject <SCNetworkReachabilityDelegate> *)aDelegate
 {
     self = [super init];
     if (self)
     {
         ref = aRef;
-        delegate = aDelegate;
-        [self scheduleReachabilityRef];
     }
     return self;
 }
 
 - (void)dealloc
 {
-    [self unscheduleReachabilityRef];
     if (ref)
     {
+        SCNetworkReachabilitySetDispatchQueue(ref, NULL);
         CFRelease(ref);
     }
 }
@@ -57,66 +47,48 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
 #pragma mark -
 #pragma mark actions
 
-- (void)scheduleReachabilityRef
+- (BOOL)startReachabilityObserver
 {
-    if ([self setCallbackForReachabilityRef])
+    BOOL success = SCNetworkReachabilitySetDispatchQueue(ref, self.queue);
+    if (success)
     {
-        [self setRunLoopForReachabilityRef];
+        NSString *name = self.notificationName;
+        SCNetworkReachabilityContext context = {0, (__bridge void *)name, NULL, NULL, NULL};
+        success = SCNetworkReachabilitySetCallback(ref, callbackForReachabilityRef, &context);
     }
-}
-
-- (void)unscheduleReachabilityRef
-{
-    if (ref)
-    {
-        SCNetworkReachabilityUnscheduleFromRunLoop(ref, CFRunLoopGetCurrent(),
-                                                   kCFRunLoopDefaultMode);
-    }
+    return success;
 }
 
 #pragma mark -
-#pragma mark private
+#pragma mark properties
 
-- (BOOL)setCallbackForReachabilityRef
+- (dispatch_queue_t)queue
 {
-    SCNetworkReachabilityContext context = {0, (__bridge void *)(delegate), NULL, NULL, NULL};
-    if (!SCNetworkReachabilitySetCallback(ref, callbackForReachabilityRef, &context))
+    if (!queue)
     {
-        NSError *error = [NSError errorWithDomain:SC_SCHEDULER_ERROR_DOMAIN_CALLBACK
-                                             code:SC_SCHEDULER_ERROR_CODE_CALLBACK
-                                         userInfo:nil];
-        [delegate reachabilityDidFail:error];
-        return NO;
+        NSString *queueName = [NSString stringWithFormat:@"%d.org.okolodev.reachability", self.hash];
+        queue = dispatch_queue_create([queueName cStringUsingEncoding:NSASCIIStringEncoding], NULL);
     }
-    return YES;
+    return queue;
 }
 
-- (void)setRunLoopForReachabilityRef
+- (NSString *)notificationName
 {
-    if (!SCNetworkReachabilityScheduleWithRunLoop(ref, CFRunLoopGetCurrent(),
-                                                  kCFRunLoopDefaultMode))
-    {
-        NSError *error = [NSError errorWithDomain:SC_SCHEDULER_ERROR_DOMAIN_SCHEDULE
-                                             code:SC_SCHEDULER_ERROR_CODE_SCHEDULE
-                                         userInfo:nil];
-        [delegate reachabilityDidFail:error];
-    }
+    return [NSString stringWithFormat:@"%@.%d", kSCNetworkReachabilityChangedNotification,
+                     self.hash];
 }
 
 #pragma mark -
 #pragma mark callback
 
-static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
+static void callbackForReachabilityRef(SCNetworkReachabilityRef __unused target,
                                        SCNetworkReachabilityFlags flags, void *data)
 {
-    @autoreleasepool
-    {
-        NSObject <SCNetworkReachabilityDelegate> *delegate;
-        delegate = (__bridge NSObject <SCNetworkReachabilityDelegate> *)data;
-        SCNetworkReachabilityFlagsParser *parser = [[SCNetworkReachabilityFlagsParser alloc]
-                                                     initWithReachabilityFlags:flags];
-        [delegate reachabilityDidChange:[parser status]];
-    }
+    NSString *notificationName = (__bridge NSString *)data;
+    SCNetworkReachabilityFlagsParser *parser;
+    parser = [[SCNetworkReachabilityFlagsParser alloc] initWithReachabilityFlags:flags];
+    NSNumber *number = [[NSNumber alloc] initWithInteger:parser.status];
+    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:number];
 }
 
 @end

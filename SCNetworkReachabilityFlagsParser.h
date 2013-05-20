@@ -18,7 +18,6 @@
 
 // initialization
 - (id)initWithReachabilityFlags:(SCNetworkReachabilityFlags)aFlags;
-- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef;
 // actions
 - (SCNetworkStatus)status;
 

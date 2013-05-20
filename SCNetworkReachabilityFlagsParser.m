@@ -43,13 +43,6 @@
 }
 
 
-- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef
-{
-    SCNetworkReachabilityFlags aFlags;
-    SCNetworkReachabilityGetFlags(reachabilityRef, &aFlags);
-    return [self initWithReachabilityFlags:aFlags];
-}
-
 #pragma mark -
 #pragma mark actions
 

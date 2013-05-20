@@ -12,7 +12,6 @@
 #import "SCNetworkStatus.h"
 
 typedef void (^SCNetworkReachabilityChanged)(SCNetworkStatus status);
-typedef void (^SCNetworkReachabilityFailed)(NSError *error);
 
 @class SCNetworkReachabilityScheduler;
 
@@ -23,7 +22,6 @@ typedef void (^SCNetworkReachabilityFailed)(NSError *error);
 
 @property (nonatomic, weak, readwrite) NSObject <SCNetworkReachabilityDelegate> *delegate;
 @property (nonatomic, strong, readwrite) SCNetworkReachabilityChanged changedBlock;
-@property (nonatomic, strong, readwrite) SCNetworkReachabilityFailed failedBlock;
 @property (nonatomic, assign, readonly) SCNetworkStatus status;
 
 // initialization

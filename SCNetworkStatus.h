@@ -10,6 +10,7 @@
 
 typedef enum
 {
+    SCNetworkStatusUndefined = -1,
     SCNetworkStatusNotReachable = 0,
     SCNetworkStatusReachableViaWiFi = 1,
     SCNetworkStatusReachableViaCellular = 2
