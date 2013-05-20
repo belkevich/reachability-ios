@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 okolodev. All rights reserved.
 //
 
+#import <SystemConfiguration/SystemConfiguration.h>
 #import "SCNetworkReachabilityScheduler.h"
 #import "SCNetworkReachabilityFlagsParser.h"
 
@@ -13,6 +14,8 @@ NSString const *kSCNetworkReachabilityChangedNotification = @"SCNetworkReachabil
 
 static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
                                        SCNetworkReachabilityFlags flags, void *data);
+static void callbackForReachabilityRelease(const void *data);
+static const void* callbackForReachabilityRetain(const void *data);
 
 @interface SCNetworkReachabilityScheduler ()
 
@@ -49,12 +52,14 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
 
 - (BOOL)startReachabilityObserver
 {
-    BOOL success = SCNetworkReachabilitySetDispatchQueue(ref, self.queue);
+    SCNetworkReachabilityContext context = {0, NULL, NULL, NULL, NULL};
+    context.info = (__bridge void *)self.notificationName;
+    context.retain = callbackForReachabilityRetain;
+    context.release = callbackForReachabilityRelease;
+    BOOL success = SCNetworkReachabilitySetCallback(ref, callbackForReachabilityRef, &context);
     if (success)
     {
-        NSString *name = self.notificationName;
-        SCNetworkReachabilityContext context = {0, (__bridge void *)name, NULL, NULL, NULL};
-        success = SCNetworkReachabilitySetCallback(ref, callbackForReachabilityRef, &context);
+        success = SCNetworkReachabilitySetDispatchQueue(ref, self.queue);
     }
     return success;
 }
@@ -66,7 +71,8 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
 {
     if (!queue)
     {
-        NSString *queueName = [NSString stringWithFormat:@"%d.org.okolodev.reachability", self.hash];
+        NSString *queueName = [NSString stringWithFormat:@"%ld.org.okolodev.reachability",
+                               (unsigned long)self.hash];
         queue = dispatch_queue_create([queueName cStringUsingEncoding:NSASCIIStringEncoding], NULL);
     }
     return queue;
@@ -74,8 +80,8 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
 
 - (NSString *)notificationName
 {
-    return [NSString stringWithFormat:@"%@.%d", kSCNetworkReachabilityChangedNotification,
-                     self.hash];
+    return [NSString stringWithFormat:@"%@.%ld", kSCNetworkReachabilityChangedNotification,
+                     (unsigned long)self.hash];
 }
 
 #pragma mark -
@@ -89,6 +95,17 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef __unused target,
     parser = [[SCNetworkReachabilityFlagsParser alloc] initWithReachabilityFlags:flags];
     NSNumber *number = [[NSNumber alloc] initWithInteger:parser.status];
     [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:number];
+}
+
+static void callbackForReachabilityRelease(const void *data)
+{
+    CFRelease(data);
+}
+
+static const void* callbackForReachabilityRetain(const void *data)
+{
+    NSString *string = (__bridge NSString *)data;
+    return CFBridgingRetain(string);
 }
 
 @end

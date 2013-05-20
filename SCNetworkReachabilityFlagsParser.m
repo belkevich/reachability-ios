@@ -11,7 +11,9 @@
 @interface SCNetworkReachabilityFlagsParser ()
 
 - (BOOL)isReachable;
+#if TARGET_OS_IPHONE
 - (BOOL)isCellular;
+#endif
 
 @end
 
@@ -28,7 +30,11 @@
         flags = aFlags;
 #ifdef DEBUG
         NSLog(@"Reachability Flag Status: %c%c %c%c%c%c%c%c%c\n",
+#if TARGET_OS_IPHONE
               (flags & kSCNetworkReachabilityFlagsIsWWAN) ? 'W' : '-',
+#else
+              '-',
+#endif
               (flags & kSCNetworkReachabilityFlagsReachable) ? 'R' : '-',
               (flags & kSCNetworkReachabilityFlagsTransientConnection) ? 't' : '-',
               (flags & kSCNetworkReachabilityFlagsConnectionRequired) ? 'c' : '-',
@@ -50,8 +56,12 @@
 {
     if ([self isReachable])
     {
+#if TARGET_OS_IPHONE
         return [self isCellular] ? SCNetworkStatusReachableViaCellular :
                SCNetworkStatusReachableViaWiFi;
+#else
+        return SCNetworkStatusReachable;
+#endif
     }
     else
     {
@@ -67,9 +77,11 @@
     return (flags & kSCNetworkReachabilityFlagsReachable) != 0;
 }
 
+#if TARGET_OS_IPHONE
 - (BOOL)isCellular
 {
     return (flags & kSCNetworkReachabilityFlagsIsWWAN) != 0;
 }
+#endif
 
 @end

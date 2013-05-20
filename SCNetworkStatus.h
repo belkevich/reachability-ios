@@ -12,6 +12,10 @@ typedef enum
 {
     SCNetworkStatusUndefined = -1,
     SCNetworkStatusNotReachable = 0,
+#if TARGET_OS_IPHONE
     SCNetworkStatusReachableViaWiFi = 1,
     SCNetworkStatusReachableViaCellular = 2
+#else
+    SCNetworkStatusReachable = 3
+#endif
 } SCNetworkStatus;
