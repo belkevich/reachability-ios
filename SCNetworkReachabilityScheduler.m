@@ -6,9 +6,9 @@
 //  Copyright (c) 2013 okolodev. All rights reserved.
 //
 
-#import <SystemConfiguration/SystemConfiguration.h>
 #import "SCNetworkReachabilityScheduler.h"
 #import "SCNetworkReachabilityFlagsParser.h"
+
 
 NSString const *kSCNetworkReachabilityChangedNotification = @"SCNetworkReachabilityChanged";
 
@@ -17,11 +17,6 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
 static void callbackForReachabilityRelease(const void *data);
 static const void* callbackForReachabilityRetain(const void *data);
 
-@interface SCNetworkReachabilityScheduler ()
-
-@property (nonatomic, weak, readonly) dispatch_queue_t queue;
-
-@end
 
 @implementation SCNetworkReachabilityScheduler
 
@@ -45,6 +40,12 @@ static const void* callbackForReachabilityRetain(const void *data);
         SCNetworkReachabilitySetDispatchQueue(ref, NULL);
         CFRelease(ref);
     }
+#if !OS_OBJECT_USE_OBJC
+    if (queue)
+    {
+        dispatch_release(queue);
+    }
+#endif
 }
 
 #pragma mark -
@@ -59,7 +60,7 @@ static const void* callbackForReachabilityRetain(const void *data);
     BOOL success = SCNetworkReachabilitySetCallback(ref, callbackForReachabilityRef, &context);
     if (success)
     {
-        success = SCNetworkReachabilitySetDispatchQueue(ref, self.queue);
+        success = SCNetworkReachabilitySetDispatchQueue(ref, [self queue]);
     }
     return success;
 }
