@@ -80,10 +80,12 @@
     return [[SCNetworkReachability alloc] initWithHostAddress:hostAddress];
 }
 
+#if TARGET_OS_IPHONE
 + (SCNetworkReachability *)reachabilityForLocalWiFi
 {
     return [[SCNetworkReachability alloc] initForLocalWiFi];
 }
+#endif
 
 #pragma mark -
 #pragma mark private

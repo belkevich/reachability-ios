@@ -31,6 +31,8 @@ typedef void (^SCNetworkReachabilityChanged)(SCNetworkStatus status);
 // static initialization
 + (SCNetworkReachability *)reachabilityWithHostName:(NSString *)hostName;
 + (SCNetworkReachability *)reachabilityWithHostAddress:(const struct sockaddr_in *)hostAddress;
+#if TARGET_OS_IPHONE
 + (SCNetworkReachability *)reachabilityForLocalWiFi;
+#endif
 
 @end

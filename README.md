@@ -10,6 +10,9 @@ SCNetworkReachability class is the wrapper on C-structures and C-functions of [S
 #### Differences from [Apple's reachability](http://developer.apple.com/library/ios/#samplecode/Reachability/Introduction/Intro.html)
 * No `NSNotificationCenter`. Use blocks or delegate is your choice.
 * No "code smell". All code is in OOP-style.
+* No synchronous reachability checks. Your app will not crash because of bad connection
+* Thread safety. Delegate or block will run in the same thread where `reachability` was created
+* OS X support
 * ARC support
 
 ## Installation
@@ -26,98 +29,72 @@ And run command
 Then add files to your XCode project. And add `SystemConfiguration.framework` 
 to your `Target` -> `Build phases` -> `Link Binary With Libraries`
 
-## Check reachability status
+###### Note
+> If your app use manual memory management then don't forget to convert SCNetworkReachability to ARC!
+
+## Using
+
+#### Check reachability status using delegate
+Class that checks changes should conforms to `SCNetworkReachabilityDelegate` protocol:
+``` objective-c
+@interface MyClass : NSObject <SCNetworkReachabilityDelegate>
+...
+```
+And implement method:
 ```objective-c
-SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostName:@"www.github.com"];
-if (reachability.status == SCNetworkStatusNotReachable)
+- (void)reachabilityDidChange:(SCNetworkStatus)status
 {
-  	// no internet connection
-} 
-else
-{
-  	// do network routine
+    switch (status)
+    {
+        case SCNetworkStatusReachableViaWiFi:
+        case SCNetworkStatusReachableViaCellular:
+            // do network routine
+            break;
+        case SCNetworkStatusNotReachable:
+            // show error, release connection, etc.
+            break;
+        default:
+            break;  
 }
 ```
-### Note
-> Requires ARC
-
-#### Check is connection Wi-Fi or Cellular
-``` objective-c
-SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostName:@"www.github.com"];
-if (reachability.status == SCNetworkStatusViaCellular)
-{
-  	// internet connection via cellular
-} 
-else if (reachability.status == SCNetworkStatusViaWiFi)
-{
-  	// internet connection via Wi-Fi 
-}
-else
-{
-    // internet connection not reachable
-}
-```
-### Note
-> In OS X 'cellular' means any network access (LAN, Bluetooth) except WiFi
-
-## Check reachability status changed
-#### Delegate
-Class that checks changes should implement `SCNetworkReachabilityDelegate` protocol methods:
-``` objective-c
-@protocol SCNetworkReachabilityDelegate <NSObject>
-
-@required
-- (void)reachabilityDidChange:(SCNetworkReachability *)reachability;
-
-@optional
-- (void)reachability:(SCNetworkReachability *)reachability didFail:(NSError *)error;
-
-@end
-```
-
-And set reachability instance delegate to self
+Then create `reachability` instance and set `delegate` to `self`:
 ``` objective-c
 SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostName:@"www.github.com"];
 reachability.delegate = self;
 ```
+And delegate will be called as soon as reachability status will be determined
+###### Note
+> If you check status immediately after `reachability` creation you will get `SCNetworkStatusUndefined`. It happens because reachability status determination process is asynchronous and some time should pass before you can use `reachability.status`
 
-#### Blocks
-Change block
+#### Check reachability status using block
 ``` objective-c
 SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostName:@"www.github.com"];
 reachability.changedBlock = ^(SCNetworkStatus status)
 {
-    // do some changes depend on status
+    // do some work depend on status
 };
 
 ```
-
-Fail block
-``` objective-c
-SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostName:@"www.github.com"];
-reachability.failedBlock = ^(NSError *error)
-{
-    // show error
-};
-```
-
-### Note
+###### Note
 > If you set both delegate and block then only delegate will be called
+
+#### Check reachability status on OS X
+There is only one difference from iOS that you have only one status `SCNetworkStatusReachable` instead of `SCNetworkStatusReachableViaWiFi` and `SCNetworkStatusReachableViaCellular`.
 
 ## Compatibility with [Apple's reachability](http://developer.apple.com/library/ios/#samplecode/Reachability/Introduction/Intro.html)
 
-I've leaved two reachability initialization methods to make it compatible with Apple's reachabililty. I've never used them but it can be useful for somebody.
+I've leaved two reachability initialization methods to make it compatible with Apple's reachabililty. I've never used them but it can be useful for someone.
 
-#### Local WiFi
+#### Reachability with local WiFi
 Determine WiFi reachability on device
 ```objective-c
 reachability = [SCNetworkReachability reachabilityForLocalWiFi];
 ```
 
-### Note
-> If WiFi available it dones't mean that internet is available. For example it's can be local network without internet access.
+###### Note
+> Not available for OS X. Also, if WiFi available it dones't mean that internet is available. For example it's can be local network without internet access.
 
-#### IP-address struct
+#### Reachability with IP-address struct
 Reachability for IP-address
 ```objective-c
 struct sockaddr_in address;
