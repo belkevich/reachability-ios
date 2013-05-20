@@ -16,7 +16,7 @@
 @property (nonatomic, strong, readwrite) id observer;
 
 - (void)observeReachabilityChangedNotificationName:(NSString *)name;
-- (void)reachabilityChangedNotification:(NSNotification *)notification;
+- (void)updateReachabilityStatus:(SCNetworkStatus)status;
 
 @end
 
@@ -96,15 +96,15 @@
     self.observer = [center addObserverForName:name object:nil queue:queue
                                     usingBlock:^(NSNotification *notification)
     {
-        [weakSelf reachabilityChangedNotification:notification];
+        NSNumber *number = notification.object;
+        [weakSelf updateReachabilityStatus:(SCNetworkStatus)[number integerValue]];
     }];
 }
 
 
-- (void)reachabilityChangedNotification:(NSNotification *)notification
+- (void)updateReachabilityStatus:(SCNetworkStatus)status
 {
-    NSNumber *number = notification.object;
-    self.status = (SCNetworkStatus)[number integerValue];
+    self.status = status;
     if (self.delegate)
     {
         [self.delegate reachabilityDidChange:self.status];
