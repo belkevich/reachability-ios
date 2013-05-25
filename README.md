@@ -92,7 +92,7 @@ reachability = [SCNetworkReachability reachabilityForLocalWiFi];
 ```
 
 ###### Note
-> Not available for OS X. Also, if WiFi available it dones't mean that internet is available. For example it's can be local network without internet access.
+> Not available for OS X. Also, if WiFi available it doesn't mean that internet is available. For example it's can be local network without internet access.
 
 #### Reachability with IP-address struct
 Reachability for IP-address
