@@ -1,4 +1,4 @@
-Network reachability for iOS
+Network reachability for iOS and OS X
 ============
 
 ## About
@@ -34,6 +34,8 @@ to your `Target` -> `Build phases` -> `Link Binary With Libraries`
 
 ###### Note
 > If your app use manual memory management then don't forget to convert SCNetworkReachability to ARC!
+
+---
 
 ## Using
 
@@ -86,6 +88,8 @@ reachability.changedBlock = ^(SCNetworkStatus status)
 #### Check reachability status on OS X
 There is only one difference from iOS that you have only one status `SCNetworkStatusReachable` instead of `SCNetworkStatusReachableViaWiFi` and `SCNetworkStatusReachableViaCellular`.
 
+---
+
 ## Best practices
 For example, you would like to check reachability before run connection.
 
@@ -126,6 +130,8 @@ reachability.changedBlock = ^(SCNetworkStatus status)
 };
 
 ```
+
+---
 
 ## Compatibility with [Apple's reachability](http://developer.apple.com/library/ios/#samplecode/Reachability/Introduction/Intro.html)
 
