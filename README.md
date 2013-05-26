@@ -7,6 +7,7 @@ Painless network reachability with delegate and blocks support.
 #### Details 
 SCNetworkReachability class is the wrapper on C-structures and C-functions of [SCNetworkReachability API](https://developer.apple.com/library/mac/#documentation/SystemConfiguration/Reference/SCNetworkReachabilityRef/Reference/reference.html#//apple_ref/doc/uid/TP40007260) in [SystemConfiguration.framework](https://developer.apple.com/library/mac/#documentation/Networking/Reference/SysConfig/_index.html#//apple_ref/doc/uid/TP40001027)
 
+---
 #### Differences from [Apple's reachability](http://developer.apple.com/library/ios/#samplecode/Reachability/Introduction/Intro.html)
 * No `NSNotificationCenter`. Use blocks or delegate is your choice.
 * No "code smell". All code is in OOP-style.
@@ -15,6 +16,7 @@ SCNetworkReachability class is the wrapper on C-structures and C-functions of [S
 * OS X support
 * ARC support
 
+---
 ## Installation
 #### Add with cocoa pods
 Add to [Podfile](https://github.com/CocoaPods/CocoaPods/wiki/A-Podfile)
@@ -22,6 +24,7 @@ Add to [Podfile](https://github.com/CocoaPods/CocoaPods/wiki/A-Podfile)
 And run command
 `pod install`
 
+---
 #### Add as git submodule
 	cd <project source directory>
 	git submodule add https://github.com/belkevich/reachability-ios.git <submodules directory>
@@ -36,7 +39,7 @@ to your `Target` -> `Build phases` -> `Link Binary With Libraries`
 
 #### Check reachability status using delegate
 Class that checks changes should conforms to `SCNetworkReachabilityDelegate` protocol:
-``` objective-c
+```objective-c
 @interface MyClass : NSObject <SCNetworkReachabilityDelegate>
 ...
 ```
@@ -66,6 +69,7 @@ And delegate will be called as soon as reachability status will be determined
 ###### Note
 > If you check status immediately after `reachability` creation you will get `SCNetworkStatusUndefined`. It happens because reachability status determination process is asynchronous and some time should pass before you can use `reachability.status`
 
+---
 #### Check reachability status using block
 ``` objective-c
 SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostName:@"www.github.com"];
@@ -78,8 +82,50 @@ reachability.changedBlock = ^(SCNetworkStatus status)
 ###### Note
 > If you set both delegate and block then only delegate will be called
 
+---
 #### Check reachability status on OS X
 There is only one difference from iOS that you have only one status `SCNetworkStatusReachable` instead of `SCNetworkStatusReachableViaWiFi` and `SCNetworkStatusReachableViaCellular`.
+
+## Best practices
+For example, you would like to check reachability before run connection.
+
+#### How you should NOT to do
+```objective-c
+...
+SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostName:@"www.github.com"];
+if (reachability.status == SCNetworkStatusNotReachable)
+{
+    [connection stop];
+    NSLog(@"Host is unrechable. Connection closed");
+    // show error, etc
+}
+else
+{
+    [connection start];
+}
+```
+In this case `status` will be `SCNetworkStatusUndefined` because reachability check is asynchronous and status will be updated after some time.
+
+---
+#### How you should to do
+``` objective-c
+...
+SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostName:@"www.github.com"];
+reachability.changedBlock = ^(SCNetworkStatus status)
+{
+    if (reachability.status == SCNetworkStatusNotReachable)
+    {
+        [connection stop];
+        NSLog(@"Host is unrechable. Connection closed");
+        // show error, etc
+    }
+    else
+    {
+        [connection start];
+    }
+};
+
+```
 
 ## Compatibility with [Apple's reachability](http://developer.apple.com/library/ios/#samplecode/Reachability/Introduction/Intro.html)
 
@@ -94,6 +140,7 @@ reachability = [SCNetworkReachability reachabilityForLocalWiFi];
 ###### Note
 > Not available for OS X. Also, if WiFi available it doesn't mean that internet is available. For example it's can be local network without internet access.
 
+---
 #### Reachability with IP-address struct
 Reachability for IP-address
 ```objective-c
