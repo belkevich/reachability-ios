@@ -60,6 +60,7 @@ And implement method:
             break;
         default:
             break;  
+	}
 }
 ```
 Then create `reachability` instance and set `delegate` to `self`:
