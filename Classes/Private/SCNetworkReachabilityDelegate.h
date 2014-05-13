@@ -9,9 +9,11 @@
 #import <Foundation/Foundation.h>
 #import "SCNetworkStatus.h"
 
+@class SCNetworkReachability;
+
 @protocol SCNetworkReachabilityDelegate <NSObject>
 
 @required
-- (void)reachabilityDidChange:(SCNetworkStatus)status;
+- (void)reachability:(SCNetworkReachability *)reachability didChangeStatus:(SCNetworkStatus)status;
 
 @end

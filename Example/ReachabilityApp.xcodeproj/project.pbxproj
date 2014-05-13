@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		146ADEFF6D1549749358816B /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34BB5D4A75694AEA94DDC850 /* libPods.a */; };
+		A0FE9C627E0645B5998568B6 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BAEFF40CD38405EA7E3FCAD /* libPods.a */; };
 		FA5FB8B718F7F5DD003EFDEB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA5FB8B618F7F5DD003EFDEB /* Foundation.framework */; };
 		FA5FB8B918F7F5DD003EFDEB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA5FB8B818F7F5DD003EFDEB /* CoreGraphics.framework */; };
 		FA5FB8BB18F7F5DD003EFDEB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA5FB8BA18F7F5DD003EFDEB /* UIKit.framework */; };
@@ -17,11 +17,18 @@
 		FA5FB8C918F7F5DD003EFDEB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FA5FB8C818F7F5DD003EFDEB /* Images.xcassets */; };
 		FA5FB8E818F7F89C003EFDEB /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA5FB8E718F7F89C003EFDEB /* Storyboard.storyboard */; };
 		FA5FB8EC18F7F8C8003EFDEB /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FA5FB8EB18F7F8C8003EFDEB /* MainViewController.m */; };
+		FAAA1CAE1902C11800A14ED3 /* SCReachabilityFlagsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = FAAA1CA11902C11800A14ED3 /* SCReachabilityFlagsParser.m */; };
+		FAAA1CAF1902C11800A14ED3 /* SCReachabilityRefBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = FAAA1CA31902C11800A14ED3 /* SCReachabilityRefBuilder.m */; };
+		FAAA1CB01902C11800A14ED3 /* SCReachabilityScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = FAAA1CA51902C11800A14ED3 /* SCReachabilityScheduler.m */; };
+		FAAA1CB11902C11800A14ED3 /* SCNetworkReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = FAAA1CA81902C11800A14ED3 /* SCNetworkReachability.m */; };
+		FAAA1CB21902C11800A14ED3 /* SCNetworkReachability+Compatibility.m in Sources */ = {isa = PBXBuildFile; fileRef = FAAA1CAD1902C11800A14ED3 /* SCNetworkReachability+Compatibility.m */; };
+		FAAA1CF41902C6D800A14ED3 /* SCReachabilityRefBuilder+Compatibility.m in Sources */ = {isa = PBXBuildFile; fileRef = FAAA1CF31902C6D800A14ED3 /* SCReachabilityRefBuilder+Compatibility.m */; };
+		FAF88FBC19094D53006F1EB2 /* SCNetworkReachability+Shared.m in Sources */ = {isa = PBXBuildFile; fileRef = FAF88FBB19094D53006F1EB2 /* SCNetworkReachability+Shared.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		34BB5D4A75694AEA94DDC850 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		BF67E3CE6627483289129C77 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
+		5BAEFF40CD38405EA7E3FCAD /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB9D382D2A6F463BAA56BA8A /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		FA5FB8B318F7F5DD003EFDEB /* ReachabilityApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReachabilityApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA5FB8B618F7F5DD003EFDEB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		FA5FB8B818F7F5DD003EFDEB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -36,6 +43,23 @@
 		FA5FB8E718F7F89C003EFDEB /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		FA5FB8EA18F7F8C8003EFDEB /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
 		FA5FB8EB18F7F8C8003EFDEB /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
+		FAAA1C9F1902C11800A14ED3 /* SCNetworkReachabilityDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCNetworkReachabilityDelegate.h; sourceTree = "<group>"; };
+		FAAA1CA01902C11800A14ED3 /* SCReachabilityFlagsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCReachabilityFlagsParser.h; sourceTree = "<group>"; };
+		FAAA1CA11902C11800A14ED3 /* SCReachabilityFlagsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCReachabilityFlagsParser.m; sourceTree = "<group>"; };
+		FAAA1CA21902C11800A14ED3 /* SCReachabilityRefBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCReachabilityRefBuilder.h; sourceTree = "<group>"; };
+		FAAA1CA31902C11800A14ED3 /* SCReachabilityRefBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCReachabilityRefBuilder.m; sourceTree = "<group>"; };
+		FAAA1CA41902C11800A14ED3 /* SCReachabilityScheduler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCReachabilityScheduler.h; sourceTree = "<group>"; };
+		FAAA1CA51902C11800A14ED3 /* SCReachabilityScheduler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCReachabilityScheduler.m; sourceTree = "<group>"; };
+		FAAA1CA71902C11800A14ED3 /* SCNetworkReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCNetworkReachability.h; sourceTree = "<group>"; };
+		FAAA1CA81902C11800A14ED3 /* SCNetworkReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCNetworkReachability.m; sourceTree = "<group>"; };
+		FAAA1CA91902C11800A14ED3 /* SCNetworkStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCNetworkStatus.h; sourceTree = "<group>"; };
+		FAAA1CAC1902C11800A14ED3 /* SCNetworkReachability+Compatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SCNetworkReachability+Compatibility.h"; sourceTree = "<group>"; };
+		FAAA1CAD1902C11800A14ED3 /* SCNetworkReachability+Compatibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SCNetworkReachability+Compatibility.m"; sourceTree = "<group>"; };
+		FAAA1CF21902C6D800A14ED3 /* SCReachabilityRefBuilder+Compatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SCReachabilityRefBuilder+Compatibility.h"; sourceTree = "<group>"; };
+		FAAA1CF31902C6D800A14ED3 /* SCReachabilityRefBuilder+Compatibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SCReachabilityRefBuilder+Compatibility.m"; sourceTree = "<group>"; };
+		FAF88FBA19094D53006F1EB2 /* SCNetworkReachability+Shared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SCNetworkReachability+Shared.h"; path = "Shared/SCNetworkReachability+Shared.h"; sourceTree = "<group>"; };
+		FAF88FBB19094D53006F1EB2 /* SCNetworkReachability+Shared.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "SCNetworkReachability+Shared.m"; path = "Shared/SCNetworkReachability+Shared.m"; sourceTree = "<group>"; };
+		FAF88FBE1909521E006F1EB2 /* SCNetworkReachability+Multithreading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SCNetworkReachability+Multithreading.h"; path = "Multithreading/SCNetworkReachability+Multithreading.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,7 +70,7 @@
 				FA5FB8B918F7F5DD003EFDEB /* CoreGraphics.framework in Frameworks */,
 				FA5FB8BB18F7F5DD003EFDEB /* UIKit.framework in Frameworks */,
 				FA5FB8B718F7F5DD003EFDEB /* Foundation.framework in Frameworks */,
-				146ADEFF6D1549749358816B /* libPods.a in Frameworks */,
+				A0FE9C627E0645B5998568B6 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,10 +80,11 @@
 		FA5FB8AA18F7F5DD003EFDEB = {
 			isa = PBXGroup;
 			children = (
+				FAAA1C9D1902C11800A14ED3 /* Classes */,
 				FA5FB8BC18F7F5DD003EFDEB /* ReachabilityApp */,
 				FA5FB8B518F7F5DD003EFDEB /* Frameworks */,
 				FA5FB8B418F7F5DD003EFDEB /* Products */,
-				BF67E3CE6627483289129C77 /* Pods.xcconfig */,
+				DB9D382D2A6F463BAA56BA8A /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -77,7 +102,7 @@
 				FA5FB8B618F7F5DD003EFDEB /* Foundation.framework */,
 				FA5FB8B818F7F5DD003EFDEB /* CoreGraphics.framework */,
 				FA5FB8BA18F7F5DD003EFDEB /* UIKit.framework */,
-				34BB5D4A75694AEA94DDC850 /* libPods.a */,
+				5BAEFF40CD38405EA7E3FCAD /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -131,6 +156,79 @@
 			name = Controllers;
 			sourceTree = "<group>";
 		};
+		FAAA1C9D1902C11800A14ED3 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				FAAA1C9E1902C11800A14ED3 /* Private */,
+				FAAA1CA61902C11800A14ED3 /* Public */,
+				FAAA1CAA1902C11800A14ED3 /* Subspecs */,
+			);
+			name = Classes;
+			path = ../Classes;
+			sourceTree = "<group>";
+		};
+		FAAA1C9E1902C11800A14ED3 /* Private */ = {
+			isa = PBXGroup;
+			children = (
+				FAAA1C9F1902C11800A14ED3 /* SCNetworkReachabilityDelegate.h */,
+				FAAA1CA01902C11800A14ED3 /* SCReachabilityFlagsParser.h */,
+				FAAA1CA11902C11800A14ED3 /* SCReachabilityFlagsParser.m */,
+				FAAA1CA21902C11800A14ED3 /* SCReachabilityRefBuilder.h */,
+				FAAA1CA31902C11800A14ED3 /* SCReachabilityRefBuilder.m */,
+				FAAA1CA41902C11800A14ED3 /* SCReachabilityScheduler.h */,
+				FAAA1CA51902C11800A14ED3 /* SCReachabilityScheduler.m */,
+			);
+			path = Private;
+			sourceTree = "<group>";
+		};
+		FAAA1CA61902C11800A14ED3 /* Public */ = {
+			isa = PBXGroup;
+			children = (
+				FAAA1CA71902C11800A14ED3 /* SCNetworkReachability.h */,
+				FAAA1CA81902C11800A14ED3 /* SCNetworkReachability.m */,
+				FAAA1CA91902C11800A14ED3 /* SCNetworkStatus.h */,
+			);
+			path = Public;
+			sourceTree = "<group>";
+		};
+		FAAA1CAA1902C11800A14ED3 /* Subspecs */ = {
+			isa = PBXGroup;
+			children = (
+				FAAA1CAB1902C11800A14ED3 /* Compatibility */,
+				FAF88FBD19094D5D006F1EB2 /* Shared */,
+				FAF88FC119095222006F1EB2 /* Multithreading */,
+			);
+			path = Subspecs;
+			sourceTree = "<group>";
+		};
+		FAAA1CAB1902C11800A14ED3 /* Compatibility */ = {
+			isa = PBXGroup;
+			children = (
+				FAAA1CAC1902C11800A14ED3 /* SCNetworkReachability+Compatibility.h */,
+				FAAA1CAD1902C11800A14ED3 /* SCNetworkReachability+Compatibility.m */,
+				FAAA1CF21902C6D800A14ED3 /* SCReachabilityRefBuilder+Compatibility.h */,
+				FAAA1CF31902C6D800A14ED3 /* SCReachabilityRefBuilder+Compatibility.m */,
+			);
+			path = Compatibility;
+			sourceTree = "<group>";
+		};
+		FAF88FBD19094D5D006F1EB2 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				FAF88FBA19094D53006F1EB2 /* SCNetworkReachability+Shared.h */,
+				FAF88FBB19094D53006F1EB2 /* SCNetworkReachability+Shared.m */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		FAF88FC119095222006F1EB2 /* Multithreading */ = {
+			isa = PBXGroup;
+			children = (
+				FAF88FBE1909521E006F1EB2 /* SCNetworkReachability+Multithreading.h */,
+			);
+			name = Multithreading;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -138,11 +236,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FA5FB8DF18F7F5DD003EFDEB /* Build configuration list for PBXNativeTarget "ReachabilityApp" */;
 			buildPhases = (
-				3D8379C1979E4027B3DC0A32 /* Check Pods Manifest.lock */,
+				41AA9217209340E7A5864E77 /* Check Pods Manifest.lock */,
 				FA5FB8AF18F7F5DD003EFDEB /* Sources */,
 				FA5FB8B018F7F5DD003EFDEB /* Frameworks */,
 				FA5FB8B118F7F5DD003EFDEB /* Resources */,
-				3EEBA14DC2314F3BAD383EF2 /* Copy Pods Resources */,
+				ED9327469F894403B6EBF554 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -193,7 +291,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		3D8379C1979E4027B3DC0A32 /* Check Pods Manifest.lock */ = {
+		41AA9217209340E7A5864E77 /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -208,7 +306,7 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		3EEBA14DC2314F3BAD383EF2 /* Copy Pods Resources */ = {
+		ED9327469F894403B6EBF554 /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -231,8 +329,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA5FB8C718F7F5DD003EFDEB /* AppDelegate.m in Sources */,
+				FAAA1CF41902C6D800A14ED3 /* SCReachabilityRefBuilder+Compatibility.m in Sources */,
+				FAAA1CAF1902C11800A14ED3 /* SCReachabilityRefBuilder.m in Sources */,
+				FAAA1CB01902C11800A14ED3 /* SCReachabilityScheduler.m in Sources */,
 				FA5FB8EC18F7F8C8003EFDEB /* MainViewController.m in Sources */,
 				FA5FB8C318F7F5DD003EFDEB /* main.m in Sources */,
+				FAAA1CAE1902C11800A14ED3 /* SCReachabilityFlagsParser.m in Sources */,
+				FAF88FBC19094D53006F1EB2 /* SCNetworkReachability+Shared.m in Sources */,
+				FAAA1CB21902C11800A14ED3 /* SCNetworkReachability+Compatibility.m in Sources */,
+				FAAA1CB11902C11800A14ED3 /* SCNetworkReachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,7 +427,7 @@
 		};
 		FA5FB8E018F7F5DD003EFDEB /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BF67E3CE6627483289129C77 /* Pods.xcconfig */;
+			baseConfigurationReference = DB9D382D2A6F463BAA56BA8A /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -336,7 +441,7 @@
 		};
 		FA5FB8E118F7F5DD003EFDEB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BF67E3CE6627483289129C77 /* Pods.xcconfig */;
+			baseConfigurationReference = DB9D382D2A6F463BAA56BA8A /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;

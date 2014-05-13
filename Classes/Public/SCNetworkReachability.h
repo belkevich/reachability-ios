@@ -7,32 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <netinet/in.h>
-#import "SCNetworkReachabilityDelegate.h"
 #import "SCNetworkStatus.h"
 
-typedef void (^SCNetworkReachabilityChanged)(SCNetworkStatus status);
-
-@class SCNetworkReachabilityScheduler;
-
 @interface SCNetworkReachability : NSObject
-{
-    SCNetworkReachabilityScheduler *scheduler;
-}
 
-@property (nonatomic, weak, readwrite) NSObject <SCNetworkReachabilityDelegate> *delegate;
-@property (nonatomic, strong, readwrite) SCNetworkReachabilityChanged changedBlock;
-@property (nonatomic, assign, readonly) SCNetworkStatus status;
+@property (nonatomic, readonly) NSString *host;
 
-// initialization
-- (id)initWithHostName:(NSString *)hostName;
-- (id)initWithHostAddress:(const struct sockaddr_in *)hostAddress;
-- (id)initForLocalWiFi;
-// static initialization
-+ (SCNetworkReachability *)reachabilityWithHostName:(NSString *)hostName;
-+ (SCNetworkReachability *)reachabilityWithHostAddress:(const struct sockaddr_in *)hostAddress;
-#if TARGET_OS_IPHONE
-+ (SCNetworkReachability *)reachabilityForLocalWiFi;
-#endif
+- (id)initWithHost:(NSString *)host;
+- (void)observeReachability:(void (^)(SCNetworkStatus status))block;
+- (void)reachabilityStatus:(void (^)(SCNetworkStatus status))block;
++ (void)host:(NSString *)host reachabilityStatus:(void (^)(SCNetworkStatus status))block;
 
 @end

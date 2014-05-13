@@ -8,9 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-typedef enum
+typedef NS_ENUM(NSUInteger, SCNetworkStatus)
 {
-    SCNetworkStatusUndefined = -1,
     SCNetworkStatusNotReachable = 0,
 #if TARGET_OS_IPHONE
     SCNetworkStatusReachableViaWiFi = 1,
@@ -18,4 +17,4 @@ typedef enum
 #else
     SCNetworkStatusReachable = 3
 #endif
-} SCNetworkStatus;
+};

@@ -7,124 +7,155 @@
 //
 
 #import "SCNetworkReachability.h"
-#import "SCNetworkReachabilityScheduler.h"
-#import "SCNetworkReachabilityRefBuilder.h"
+#import "SCReachabilityRefBuilder.h"
+#import "SCReachabilityScheduler.h"
+#import "SCReachabilityFlagsParser.h"
+
+NSString *const kReachabilityDefaultHost = @"www.google.com";
 
 @interface SCNetworkReachability ()
+{
+    SCReachabilityScheduler *_scheduler;
+}
 
-@property (nonatomic, assign, readwrite) SCNetworkStatus status;
-@property (nonatomic, strong, readwrite) id observer;
-
-- (void)observeReachabilityChangedNotificationName:(NSString *)name;
-- (void)updateReachabilityStatus:(NSNumber *)statusNumber;
-
+@property (atomic, assign) BOOL isStatusValid;
+@property (atomic, assign) SCNetworkStatus status;
+@property (nonatomic, copy) void (^observationBlock)(SCNetworkStatus status);
+@property (nonatomic, copy) void (^statusBlock)(SCNetworkStatus status);
 @end
 
 @implementation SCNetworkReachability
 
-#pragma mark -
-#pragma mark main routine
+#pragma mark - life cycle
+
+- (id)init
+{
+    return [self initWithHost:kReachabilityDefaultHost];
+}
+
+- (id)initWithHost:(NSString *)host
+{
+    SCNetworkReachabilityRef reachabilityRef;
+    reachabilityRef = [SCReachabilityRefBuilder reachabilityRefWithHostName:host];
+    if ([self initWithReachabilityRef:reachabilityRef])
+    {
+        _host = host;
+    }
+    return self;
+}
 
 - (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef
 {
-    self = [self init];
+    self = [super init];
     if (self)
     {
-        self.status = SCNetworkStatusUndefined;
-        scheduler = [[SCNetworkReachabilityScheduler alloc] initWithReachabilityRef:reachabilityRef];
-        [self observeReachabilityChangedNotificationName:scheduler.notificationName];
-        if ([scheduler startReachabilityObserver])
+        _scheduler = [[SCReachabilityScheduler alloc] initWithReachabilityRef:reachabilityRef];
+        __weak __typeof (self) weakSelf = self;
+        [_scheduler observeStatusChanges:^(SCNetworkStatus status)
         {
-            return self;
-        }
+            if (!weakSelf.isStatusValid && weakSelf.statusBlock)
+            {
+                weakSelf.statusBlock(status);
+                weakSelf.statusBlock = nil;
+            }
+            weakSelf.isStatusValid = YES;
+            weakSelf.status = status;
+            weakSelf.observationBlock ? weakSelf.observationBlock(status) : nil;
+        }];
     }
-    return nil;
+    return self;
 }
 
-- (id)initWithHostName:(NSString *)hostName
+#pragma mark - public
+
+- (void)observeReachability:(void (^)(SCNetworkStatus status))block
 {
-    SCNetworkReachabilityRef reachabilityRef;
-    reachabilityRef = [SCNetworkReachabilityRefBuilder reachabilityRefWithHostName:hostName];
-    return [self initWithReachabilityRef:reachabilityRef];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    [self observeReachabilityOnDispatchQueue:queue callback:block];
 }
 
-- (id)initWithHostAddress:(const struct sockaddr_in *)hostAddress
+- (void)reachabilityStatus:(void (^)(SCNetworkStatus status))block
 {
-    SCNetworkReachabilityRef reachabilityRef = nil;
-    reachabilityRef = [SCNetworkReachabilityRefBuilder reachabilityRefWithHostAddress:hostAddress];
-    return [self initWithReachabilityRef:reachabilityRef];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    [self reachabilityStatusOnDispatchQueue:queue callback:block];
 }
 
-- (id)initForLocalWiFi
++ (void)host:(NSString *)host reachabilityStatus:(void (^)(SCNetworkStatus status))block
 {
-    SCNetworkReachabilityRef reachabilityRef;
-    reachabilityRef = [SCNetworkReachabilityRefBuilder reachabilityRefForLocalWiFi];
-    return [self initWithReachabilityRef:reachabilityRef];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    [self hostReachabilityStatus:host onDispatchQueue:queue callback:block];
 }
 
-- (void)dealloc
+#pragma mark - private
+
+- (void)observeReachabilityOnDispatchQueue:(dispatch_queue_t)queue
+                                  callback:(void (^)(SCNetworkStatus))block
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self.observer];
-}
-
-#pragma mark -
-#pragma mark static initialization
-
-+ (SCNetworkReachability *)reachabilityWithHostName:(NSString *)hostName
-{
-    return [[SCNetworkReachability alloc] initWithHostName:hostName];
-}
-
-+ (SCNetworkReachability *)reachabilityWithHostAddress:(const struct sockaddr_in *)hostAddress
-{
-    return [[SCNetworkReachability alloc] initWithHostAddress:hostAddress];
-}
-
-#if TARGET_OS_IPHONE
-+ (SCNetworkReachability *)reachabilityForLocalWiFi
-{
-    return [[SCNetworkReachability alloc] initForLocalWiFi];
-}
-#endif
-
-#pragma mark -
-#pragma mark private
-
-- (void)observeReachabilityChangedNotificationName:(NSString *)name
-{
-    __weak SCNetworkReachability *weakSelf = self;
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    NSOperationQueue *currentQueue = [NSOperationQueue currentQueue];
-    NSThread *currentThread = [NSThread currentThread];
-    self.observer = [center addObserverForName:name object:nil queue:currentQueue
-                                    usingBlock:^(NSNotification *notification)
+    self.observationBlock = ^(SCNetworkStatus status)
     {
-        NSNumber *number = notification.object;
-        if (currentQueue)
+        dispatch_async(queue, ^
         {
-            [weakSelf updateReachabilityStatus:number];
+            block ? block(status) : nil;
+        });
+    };
+}
+
+- (void)reachabilityStatusOnDispatchQueue:(dispatch_queue_t)queue
+                                 callback:(void (^)(SCNetworkStatus))block
+{
+    if (block)
+    {
+        if (self.isStatusValid)
+        {
+            dispatch_async(queue, ^
+            {
+                block(self.status);
+            });
         }
         else
         {
-            NSThread *thread = currentThread ? currentThread : [NSThread mainThread];
-            [self performSelector:@selector(updateReachabilityStatus:) onThread:thread
-                       withObject:number waitUntilDone:NO];
+            if (self.statusBlock)
+            {
+                void (^previousBlock)(SCNetworkStatus status) = self.statusBlock;
+                self.statusBlock = ^(SCNetworkStatus status)
+                {
+                    previousBlock(status);
+                    dispatch_async(queue, ^
+                    {
+                        block(status);
+                    });
+                };
+            }
+            else
+            {
+                self.statusBlock = ^(SCNetworkStatus status)
+                {
+                    dispatch_async(queue, ^
+                    {
+                        block(status);
+                    });
+                };
+            }
         }
-    }];
+    }
 }
 
-
-- (void)updateReachabilityStatus:(NSNumber *)statusNumber
++ (void)hostReachabilityStatus:(NSString *)host onDispatchQueue:(dispatch_queue_t)queue
+                      callback:(void (^)(SCNetworkStatus))block
 {
-    self.status = (SCNetworkStatus)[statusNumber integerValue];
-    if (self.delegate)
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
     {
-        [self.delegate reachabilityDidChange:self.status];
-    }
-    else if (self.changedBlock)
-    {
-        self.changedBlock(self.status);
-    }
+        SCNetworkReachabilityRef reachabilityRef;
+        reachabilityRef = [SCReachabilityRefBuilder reachabilityRefWithHostName:host];
+        SCNetworkReachabilityFlags flags;
+        SCNetworkReachabilityGetFlags(reachabilityRef, &flags);
+        SCNetworkStatus status = [SCReachabilityFlagsParser statusWithFlags:flags];
+        CFRelease(reachabilityRef);
+        dispatch_async(queue, ^
+        {
+            block ? block(status) : nil;
+        });
+    });
 }
 
 @end

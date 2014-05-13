@@ -11,7 +11,7 @@
 
 NSString * const kDefaultHost = @"google.com";
 
-@interface MainViewController () <UITextFieldDelegate, SCNetworkReachabilityDelegate>
+@interface MainViewController () <UITextFieldDelegate>
 {
     SCNetworkReachability *_reachability;
 }
@@ -31,26 +31,8 @@ NSString * const kDefaultHost = @"google.com";
     [self checkReachabilityForHost:kDefaultHost];
 }
 
-#pragma mark - reachability delegate implementation
-
-- (void)reachabilityDidChange:(SCNetworkStatus)status
-{
-    switch (status)
-    {
-        case SCNetworkStatusReachableViaWiFi:
-            self.statusLabel.text = @"Reachable via WiFi";
-            break;
-        case SCNetworkStatusReachableViaCellular:
-            self.statusLabel.text = @"Reachable via Cellular";
-            break;
-        case SCNetworkStatusNotReachable:
-            self.statusLabel.text = @"Not Reachable";
-            break;
-    }
-}
 
 #pragma mark - actions
-
 
 - (IBAction)viewTapped:(id)sender
 {
@@ -79,8 +61,23 @@ NSString * const kDefaultHost = @"google.com";
 - (void)checkReachabilityForHost:(NSString *)hostName
 {
     self.statusLabel.text = @"Checking reachability status...";
-    _reachability = [[SCNetworkReachability alloc] initWithHostName:hostName];
-    _reachability.delegate = self;
+    __weak __typeof(self) weakSelf = self;
+    _reachability = [[SCNetworkReachability alloc] initWithHost:hostName];
+    [_reachability observeReachability:^(SCNetworkStatus status)
+    {
+        switch (status)
+        {
+            case SCNetworkStatusReachableViaWiFi:
+                weakSelf.statusLabel.text = @"Reachable via WiFi";
+                break;
+            case SCNetworkStatusReachableViaCellular:
+                weakSelf.statusLabel.text = @"Reachable via Cellular";
+                break;
+            case SCNetworkStatusNotReachable:
+                weakSelf.statusLabel.text = @"Not Reachable";
+                break;
+        }
+    }];
 }
 
 @end
