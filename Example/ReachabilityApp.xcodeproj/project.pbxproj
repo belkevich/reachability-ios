@@ -43,7 +43,6 @@
 		FA5FB8E718F7F89C003EFDEB /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		FA5FB8EA18F7F8C8003EFDEB /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
 		FA5FB8EB18F7F8C8003EFDEB /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
-		FAAA1C9F1902C11800A14ED3 /* SCNetworkReachabilityDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCNetworkReachabilityDelegate.h; sourceTree = "<group>"; };
 		FAAA1CA01902C11800A14ED3 /* SCReachabilityFlagsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCReachabilityFlagsParser.h; sourceTree = "<group>"; };
 		FAAA1CA11902C11800A14ED3 /* SCReachabilityFlagsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCReachabilityFlagsParser.m; sourceTree = "<group>"; };
 		FAAA1CA21902C11800A14ED3 /* SCReachabilityRefBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SCReachabilityRefBuilder.h; sourceTree = "<group>"; };
@@ -170,7 +169,6 @@
 		FAAA1C9E1902C11800A14ED3 /* Private */ = {
 			isa = PBXGroup;
 			children = (
-				FAAA1C9F1902C11800A14ED3 /* SCNetworkReachabilityDelegate.h */,
 				FAAA1CA01902C11800A14ED3 /* SCReachabilityFlagsParser.h */,
 				FAAA1CA11902C11800A14ED3 /* SCReachabilityFlagsParser.m */,
 				FAAA1CA21902C11800A14ED3 /* SCReachabilityRefBuilder.h */,
