@@ -24,8 +24,13 @@
                                         <rect key="frame" x="0.0" y="10" width="320" height="70"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <subviews>
+                                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4y6-cf-Ssg">
+                                                <rect key="frame" x="0.0" y="0.0" width="320" height="1"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <color key="backgroundColor" white="0.84999999999999998" alpha="1" colorSpace="calibratedWhite"/>
+                                            </view>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" placeholder="Host Name" textAlignment="center" minimumFontSize="12" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="cXk-uO-uhy">
-                                                <rect key="frame" x="12" y="0.0" width="296" height="70"/>
+                                                <rect key="frame" x="12" y="1" width="296" height="68"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <color key="textColor" red="0.24705882352941178" green="0.5607843137254902" blue="0.82352941176470584" alpha="1" colorSpace="calibratedRGB"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>
@@ -34,6 +39,11 @@
                                                     <outlet property="delegate" destination="D3x-jU-9yf" id="Ud0-iq-3fd"/>
                                                 </connections>
                                             </textField>
+                                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Abz-3C-Foj">
+                                                <rect key="frame" x="0.0" y="69" width="320" height="1"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <color key="backgroundColor" white="0.84999999999999998" alpha="1" colorSpace="calibratedWhite"/>
+                                            </view>
                                         </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>
