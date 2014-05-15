@@ -31,7 +31,6 @@ NSString * const kDefaultHost = @"google.com";
     [self checkReachabilityForHost:kDefaultHost];
 }
 
-
 #pragma mark - actions
 
 - (IBAction)viewTapped:(id)sender
