@@ -10,6 +10,7 @@
 #import "SCReachabilityRefBuilder.h"
 #import "SCReachabilityScheduler.h"
 #import "SCReachabilityFlagsParser.h"
+#import "macros_blocks.h"
 
 NSString *const kReachabilityDefaultHost = @"www.google.com";
 
@@ -93,10 +94,7 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
 {
     self.observationBlock = ^(SCNetworkStatus status)
     {
-        dispatch_async(queue, ^
-        {
-            block ? block(status) : nil;
-        });
+        async_queue_block(queue, block, status);
     };
 }
 
@@ -107,10 +105,8 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
     {
         if (self.isStatusValid)
         {
-            dispatch_async(queue, ^
-            {
-                block(self.status);
-            });
+            SCNetworkStatus status = self.status;
+            async_queue_block(queue, block, status);
         }
         else
         {
@@ -120,20 +116,14 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
                 self.statusBlock = ^(SCNetworkStatus status)
                 {
                     previousBlock(status);
-                    dispatch_async(queue, ^
-                    {
-                        block(status);
-                    });
+                    async_queue_block(queue, block, status);
                 };
             }
             else
             {
                 self.statusBlock = ^(SCNetworkStatus status)
                 {
-                    dispatch_async(queue, ^
-                    {
-                        block(status);
-                    });
+                    async_queue_block(queue, block, status);
                 };
             }
         }
@@ -151,10 +141,7 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
         SCNetworkReachabilityGetFlags(reachabilityRef, &flags);
         SCNetworkStatus status = [SCReachabilityFlagsParser statusWithFlags:flags];
         CFRelease(reachabilityRef);
-        dispatch_async(queue, ^
-        {
-            block ? block(status) : nil;
-        });
+        async_queue_block(queue, block, status);
     });
 }
 
