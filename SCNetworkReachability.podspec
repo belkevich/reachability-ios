@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = "SCNetworkReachability"
   s.version      = "2.0.0"
-  s.summary      = "Painless network reachability with delegate and blocks support."
+  s.summary      = "Flexible network reachability with blocks for iOS and OS X."
   s.homepage     = "https://github.com/belkevich/reachability-ios"
   s.license      = { :type => 'MIT', :file => 'LICENSE.txt' }
   s.author       = { "Alexey Belkevich" => "belkevich.alexey@gmail.com" }
@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'Core' do |ss|
     ss.source_files = 'Classes/P*/*.{h,m}'
+    ss.dependency 'macros_blocks', '0.0.1'
   end
 
   s.subspec 'Multithreading' do |ss|
@@ -22,6 +23,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'Shared' do |ss|
     ss.dependency 'SCNetworkReachability/Core'
+    ss.dependency 'ABMultiton', '~> 2.0'
     ss.source_files = 'Classes/Subspecs/Shared/*.{h,m}'
   end
 
