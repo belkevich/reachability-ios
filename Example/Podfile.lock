@@ -1,0 +1,17 @@
+PODS:
+  - ABMultiton (2.0.5):
+    - ABMultiton/Core
+  - ABMultiton/Core (2.0.5)
+  - macros_blocks (0.0.3):
+    - macros_blocks/core
+  - macros_blocks/core (0.0.3)
+
+DEPENDENCIES:
+  - ABMultiton
+  - macros_blocks
+
+SPEC CHECKSUMS:
+  ABMultiton: 25c3aab81c12b1dcc42bed0691b72000cba2bd0a
+  macros_blocks: a3dfb3517f647a34700cc165c4363bc0a377443d
+
+COCOAPODS: 0.34.4
