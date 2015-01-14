@@ -38,7 +38,8 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
 {
     SCNetworkReachabilityRef reachabilityRef;
     reachabilityRef = [SCReachabilityRefBuilder reachabilityRefWithHostName:host];
-    if ([self initWithReachabilityRef:reachabilityRef])
+    self = [self initWithReachabilityRef:reachabilityRef];
+    if (self)
     {
         _host = host;
     }
