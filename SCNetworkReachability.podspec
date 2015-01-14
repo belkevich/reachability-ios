@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "SCNetworkReachability"
-  s.version      = "2.0.0"
+  s.version      = "2.0.1"
   s.summary      = "Flexible network reachability with blocks for iOS and OS X."
   s.homepage     = "https://github.com/belkevich/reachability-ios"
   s.license      = { :type => 'MIT', :file => 'LICENSE.txt' }
@@ -38,5 +38,7 @@ Pod::Spec.new do |s|
     ss.dependency 'SCNetworkReachability/Multithreading'
     ss.dependency 'SCNetworkReachability/Compatibility'
   end
+
+  s.default_subspec = 'Core'
 
 end
