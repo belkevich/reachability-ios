@@ -38,8 +38,7 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
 {
     SCNetworkReachabilityRef reachabilityRef;
     reachabilityRef = [SCReachabilityRefBuilder reachabilityRefWithHostName:host];
-    self = [self initWithReachabilityRef:reachabilityRef];
-    if (self)
+    if ([self initWithReachabilityRef:reachabilityRef])
     {
         _host = host;
     }
@@ -51,19 +50,18 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
     self = [super init];
     if (self)
     {
-        _scheduler = [[SCReachabilityScheduler alloc] initWithReachabilityRef:reachabilityRef];
         __weak __typeof (self) weakSelf = self;
-        [_scheduler observeStatusChanges:^(SCNetworkStatus status)
-        {
-            if (!weakSelf.isStatusValid && weakSelf.statusBlock)
-            {
-                weakSelf.statusBlock(status);
-                weakSelf.statusBlock = nil;
-            }
-            weakSelf.isStatusValid = YES;
-            weakSelf.status = status;
-            weakSelf.observationBlock ? weakSelf.observationBlock(status) : nil;
-        }];
+        _scheduler = [[SCReachabilityScheduler alloc] initWithReachabilityRef:reachabilityRef statusChangesBlock:^(SCNetworkStatus status)
+              {
+                  if (!weakSelf.isStatusValid && weakSelf.statusBlock)
+                  {
+                      weakSelf.statusBlock(status);
+                      weakSelf.statusBlock = nil;
+                  }
+                  weakSelf.isStatusValid = YES;
+                  weakSelf.status = status;
+                  weakSelf.observationBlock ? weakSelf.observationBlock(status) : nil;
+              }];
     }
     return self;
 }

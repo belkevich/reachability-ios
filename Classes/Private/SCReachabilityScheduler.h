@@ -12,7 +12,6 @@
 
 @interface SCReachabilityScheduler : NSObject
 
-- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef;
-- (void)observeStatusChanges:(void (^)(SCNetworkStatus status))statusChangesBlock;
+- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef statusChangesBlock:(void (^)(SCNetworkStatus status))statusChangesBlock;
 
 @end
