@@ -24,12 +24,13 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
 
 #pragma mark - life cycle
 
-- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef
+- (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef statusChangesBlock:(void (^)(SCNetworkStatus status))statusChangesBlock
 {
     self = [super init];
     if (self)
     {
         _reachabilityRef = reachabilityRef;
+        _statusChangesBlock = statusChangesBlock;
         NSString *name = [NSString stringWithFormat:@"org.okolodev.reachability.%lu",
                           (unsigned long)self.hash];
         _queue = dispatch_queue_create([name UTF8String], NULL);
@@ -55,13 +56,6 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
         dispatch_release(_queue);
     }
 #endif
-}
-
-#pragma mark - public
-
-- (void)observeStatusChanges:(void (^)(SCNetworkStatus status))statusChangesBlock
-{
-    self.statusChangesBlock = statusChangesBlock;
 }
 
 #pragma mark - callback
