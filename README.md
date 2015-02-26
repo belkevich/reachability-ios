@@ -16,7 +16,7 @@ Add `pod 'SCNetworkReachability'` to [Podfile](https://github.com/CocoaPods/Coco
 
 #### Using
 
-##### Check reachability status 
+##### Check reachability status
 Check current reachability status of some host. This callback will run only once immediately after reachability status will be determined.
 **Note. Callback block will run on main queue!**
 ```objective-c
@@ -136,6 +136,9 @@ struct sockaddr_in address;
 address = ...
 SCNetworkReachability *reachability = [[SCNetworkReachability alloc] initWithHostAddress:&address];
 ```
+
+#### History
+[Releases](https://github.com/belkevich/reachability-ios/releases)
 
 #### Updates
 Follow updates on twitter [@okolodev](https://twitter.com/okolodev)
