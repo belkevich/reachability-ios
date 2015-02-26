@@ -97,6 +97,10 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
     {
         async_queue_block(queue, block, status);
     };
+    if (self.isStatusValid)
+    {
+        self.observationBlock(self.status);
+    }
 }
 
 - (void)reachabilityStatusOnDispatchQueue:(dispatch_queue_t)queue
@@ -104,29 +108,10 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
 {
     if (block)
     {
+        [self updateStatusBlockWithDispatchQueue:queue block:block];
         if (self.isStatusValid)
         {
-            SCNetworkStatus status = self.status;
-            async_queue_block(queue, block, status);
-        }
-        else
-        {
-            if (self.statusBlock)
-            {
-                void (^previousBlock)(SCNetworkStatus status) = self.statusBlock;
-                self.statusBlock = ^(SCNetworkStatus status)
-                {
-                    previousBlock(status);
-                    async_queue_block(queue, block, status);
-                };
-            }
-            else
-            {
-                self.statusBlock = ^(SCNetworkStatus status)
-                {
-                    async_queue_block(queue, block, status);
-                };
-            }
+            self.statusBlock(self.status);
         }
     }
 }
@@ -144,6 +129,27 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
         CFRelease(reachabilityRef);
         async_queue_block(queue, block, status);
     });
+}
+
+- (void)updateStatusBlockWithDispatchQueue:(dispatch_queue_t)queue
+                                     block:(void (^)(SCNetworkStatus))block
+{
+    if (self.statusBlock)
+    {
+        void (^previousBlock)(SCNetworkStatus status) = self.statusBlock;
+        self.statusBlock = ^(SCNetworkStatus status)
+        {
+            previousBlock(status);
+            async_queue_block(queue, block, status);
+        };
+    }
+    else
+    {
+        self.statusBlock = ^(SCNetworkStatus status)
+        {
+            async_queue_block(queue, block, status);
+        };
+    }
 }
 
 @end
