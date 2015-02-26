@@ -1,8 +1,9 @@
 Pod::Spec.new do |s|
   s.name         = "SCNetworkReachability"
-  s.version      = "2.0.2"
+  s.version      = "2.0.3"
   s.summary      = "Flexible network reachability with blocks for iOS and OS X."
   s.homepage     = "https://github.com/belkevich/reachability-ios"
+  s.social_media_url = 'https://twitter.com/okolodev'
   s.license      = { :type => 'MIT', :file => 'LICENSE.txt' }
   s.author       = { "Alexey Belkevich" => "belkevich.alexey@gmail.com" }
   s.source       = { :git => "https://github.com/belkevich/reachability-ios.git", :tag => s.version.to_s }
