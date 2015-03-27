@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 okolodev. All rights reserved.
 //
 
-#import "SCNetworkReachability.h"
 #import <ABMultiton/ABMultitonProtocol.h>
+#import "SCNetworkReachability.h"
 
 @interface SCNetworkReachability (Shared) <ABMultitonProtocol>
 

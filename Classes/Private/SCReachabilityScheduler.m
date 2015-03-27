@@ -30,14 +30,6 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
     if (self)
     {
         _reachabilityRef = reachabilityRef;
-        NSString *name = [NSString stringWithFormat:@"org.okolodev.reachability.%lu",
-                          (unsigned long)self.hash];
-        _queue = dispatch_queue_create([name UTF8String], NULL);
-        SCNetworkReachabilityContext context = {0, (__bridge void *)self, NULL, NULL, NULL};
-        if (SCNetworkReachabilitySetCallback(_reachabilityRef, callbackForReachabilityRef, &context))
-        {
-            SCNetworkReachabilitySetDispatchQueue(_reachabilityRef, _queue);
-        }
     }
     return self;
 }
@@ -61,7 +53,26 @@ static void callbackForReachabilityRef(SCNetworkReachabilityRef target,
 
 - (void)observeStatusChanges:(void (^)(SCNetworkStatus status))statusChangesBlock
 {
+    BOOL isStatusChangesBlockEmpty = self.statusChangesBlock == nil;
     self.statusChangesBlock = statusChangesBlock;
+    if (isStatusChangesBlockEmpty)
+    {
+        [self scheduleStatusChangesCallback];
+    }
+}
+
+#pragma mark - private
+
+- (void)scheduleStatusChangesCallback
+{
+    NSString *name = [NSString stringWithFormat:@"org.okolodev.reachability.%lu",
+                                                (unsigned long)self.hash];
+    _queue = dispatch_queue_create([name UTF8String], NULL);
+    SCNetworkReachabilityContext context = {0, (__bridge void *)self, NULL, NULL, NULL};
+    if (SCNetworkReachabilitySetCallback(_reachabilityRef, callbackForReachabilityRef, &context))
+    {
+        SCNetworkReachabilitySetDispatchQueue(_reachabilityRef, _queue);
+    }
 }
 
 #pragma mark - callback
