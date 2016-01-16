@@ -21,8 +21,8 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
 
 @property (atomic, assign) BOOL isStatusValid;
 @property (atomic, assign) SCNetworkStatus status;
+@property (atomic, copy) void (^statusBlock)(SCNetworkStatus status);
 @property (nonatomic, copy) void (^observationBlock)(SCNetworkStatus status);
-@property (nonatomic, copy) void (^statusBlock)(SCNetworkStatus status);
 @end
 
 @implementation SCNetworkReachability
@@ -111,7 +111,8 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
         [self updateStatusBlockWithDispatchQueue:queue block:block];
         if (self.isStatusValid)
         {
-            self.statusBlock(self.status);
+            safe_block(self.statusBlock, self.status);
+            self.statusBlock = nil;
         }
     }
 }
@@ -136,7 +137,7 @@ NSString *const kReachabilityDefaultHost = @"www.google.com";
 {
     if (self.statusBlock)
     {
-        void (^previousBlock)(SCNetworkStatus status) = self.statusBlock;
+        void (^previousBlock)(SCNetworkStatus) = self.statusBlock;
         self.statusBlock = ^(SCNetworkStatus status)
         {
             previousBlock(status);
